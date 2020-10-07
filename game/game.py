@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
 import sys
+import qiskit as qs
 
 numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 winning_combs = [[0, 1, 2], [0, 3, 6], [0, 4, 8], [1, 4, 7], [2, 5, 8], [6, 7, 8], [3, 4, 5], [2, 4, 6]]
 
-superpositions = {"X": [], "O": []}
+superpositions_map = {"X": [], "O": []}
+superpositions = []
 
 def print_table(numbers):
 
@@ -57,8 +59,11 @@ def set_field(selectedfield, player, superposition, superpositionnumber=1):
     else:
         numbers[selectedfield] = player
 
+
+
 def set_superposition(super1, super2, player):
-    superpositions[player].append([super1, super2])
+    superpositions_map[player].append([super1, super2])
+    superpositions.append([super1, super2])
 
 
 def check_for_win(player):
@@ -91,15 +96,21 @@ def select_and_set_field(player, superpos, super_iter):
         set_field(field, player, False)
 
 
+def set_qiskit_super():
+    length = len(superpositions)
+    circ = qs.QuantumCircuit(length, length)
+    circ.h(0)
+    initial_state = [0, 1]
+
+
 def measure():
     pass
 
 
 def main():
-    end = False
     i1 = 1
     i2 = 1
-    while not end:
+    for i in range(5):
         print_table(numbers)
         selectedType = select_type()
         if selectedType == 1:
@@ -124,4 +135,6 @@ def main():
 
         check_for_win("O")
 
-main()
+
+if __name__ == "__main__":
+    main()
