@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
-numbers = [["0"],["1"],["2"],["3"],["4"],["5"],["6"],["7"],["8"]]
+
+import sys
+
+numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+winning_combs = [[0, 1, 2], [0, 3, 6], [0, 4, 8], [1, 4, 7], [2, 5, 8], [6, 7, 8], [3, 4, 5], [2, 4, 6]]
+
+superpositions = {"X": [], "O": []}
+
 def print_table(numbers):
 
     print("     ")
-    print("  {:^5} | {:^5} | {:^5} ".format(''.join(numbers[0]), ''.join(numbers[1]), ''.join(numbers[2])))
-    print("  ______ ______ ______")
-    print("  {:^5} | {:^5} | {:^5} ".format(''.join(numbers[3]), ''.join(numbers[4]), ''.join(numbers[5])))
-    print("  ______ ______ ______")
-    print("  {:^5} | {:^5} | {:^5} ".format(''.join(numbers[6]), ''.join(numbers[7]), ''.join(numbers[8])))
-    print("     ")
-    print(" ")
+    for i in range(0, 8, 3):
+        print("  {:^7} | {:^7} | {:^7} ".format(numbers[i], numbers[i+1], numbers[i+2]))
+        if i > 4:
+            print("     ")
+            continue
+        print("  ________ ________ ________")
 
 
 def select_type():
@@ -22,65 +28,100 @@ def select_type():
             else:
                 return selectedType
         except:
-            print("Pick correct number")
+            print("Pick correct number!")
 
 def select_field():
     selected = False
     while not selected:
         try:
-            selectedNumber = str(input("Select available field"))
-            if [selectedNumber] not in numbers:
-                pass
+            selectedNumber = int(input("Select available field"))
+            if isinstance(numbers[selectedNumber], str):
+                if "_" in numbers[selectedNumber]:
+                    if not len(str(numbers[selectedNumber])) > 6:
+                        return selectedNumber
+                    else:
+                        print("Field already filled to maximum.")
+
             else:
                 return selectedNumber
         except:
-            print("Pick correct number")
+            print("Pick correct number!")
 
 def set_field(selectedfield, player, superposition, superpositionnumber=1):
     if superposition:
         if isinstance(numbers[selectedfield], str):
-            numbers[selectedfield] = [numbers[selectedfield]]
-            numbers[selectedfield].append(player + f"_{superpositionnumber}")
+
+            numbers[selectedfield] = f"{numbers[selectedfield]} {player}_{superpositionnumber}"
         else:
             numbers[selectedfield] = player + f"_{superpositionnumber}"
     else:
         numbers[selectedfield] = player
 
+def set_superposition(super1, super2, player):
+    superpositions[player].append([super1, super2])
 
+
+def check_for_win(player):
+    win = False
+    for winning_comb in winning_combs:
+        for i in winning_comb:
+            if numbers[i] != player:
+                win = False
+                break
+            else:
+                win = True
+        if win:
+            end(player)
+
+def end(winner):
+    print(f"Player {winner} has won")
+    sys.exit()
+
+
+
+def select_and_set_field(player, superpos, super_iter):
+    if superpos:
+        field_1 = select_field()
+        field_2 = select_field()
+        set_superposition(field_1, field_2, player)
+        set_field(field_1, player, True, super_iter)
+        set_field(field_2, player, True, super_iter)
+    else:
+        field = select_field()
+        set_field(field, player, False)
+
+
+def measure():
+    pass
 
 
 def main():
     end = False
-    player_1 = "X"
-    player_2 = "O"
     i1 = 1
     i2 = 1
     while not end:
         print_table(numbers)
         selectedType = select_type()
         if selectedType == 1:
-            field = select_field()
-            set_field(field, player_1, False)
+            select_and_set_field("X", False, False)
         else:
 
-            field_1 = select_field()
-            field_2 = select_field()
-            set_field(field_1, player_1, True, i1)
-            set_field(field_2, player_1, True, i1)
+            select_and_set_field("X", True, i1)
             i1 += 1
 
         print_table(numbers)
+
+        check_for_win("X")
+
         selectedType = select_type()
         if selectedType == 1:
 
-            field = select_field()
-            set_field(field, player_2, False)
+            select_and_set_field("O", False, False)
 
         else:
-            field_1 = select_field()
-            field_2 = select_field()
-            set_field(field_1, player_2, True, i2)
-            set_field(field_2, player_2, True, i2)
+            select_and_set_field("O", True, i2)
             i2 += 1
+
+        check_for_win("O")
 
 main()
