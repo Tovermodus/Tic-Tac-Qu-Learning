@@ -41,6 +41,7 @@ class QLearner:
         return self.maximumReward()
 
     def newQValue(self, actionID, reward):
+        print(reward)
         return (1 - self.learningRate) * self.Qvalue(actionID) \
                + self.learningRate * (reward + self.discountFactor * self.maximumFutureReward())
 

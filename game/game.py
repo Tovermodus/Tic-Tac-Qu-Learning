@@ -2,7 +2,7 @@
 
 
 #from ..Interface import *
-
+import sys
 from game.qiskit_circ import QiskitCircuitMaker
 
 
@@ -33,37 +33,44 @@ class Game():
                 continue
             print("  ________ ________ ________")
 
+    def check_type(self, selectedType, player):
+        if selectedType not in [1, 2]:
+            return False
+        elif selectedType == 2 and self.superpositioncounter[player] > 2:
+            print("You've already made 2 quantum moves!")
+            return False
+        return True
 
-
+    def check_field(self, selectedNumber, selectedType):
+        if isinstance(self.numbers[selectedNumber], str):
+            if "_" in self.numbers[selectedNumber]:
+                if len(str(self.numbers[selectedNumber])) < 6 and selectedType == 2:
+                    return True
+                else:
+                    print("Field already filled to maximum or trying to write classical on top of superposition")
+                    return False
+        return True
 
     def select_type(self, player, machine=False):
         selected = False
+
         while not selected:
             try:
-                selectedType = int(input("Select 1 for classical or 2 for quantum move."))
-                if selectedType not in [1, 2]:
-                    pass
-                elif selectedType == 2 and self.superpositioncounter[player] > 2:
-                    print("You've already made 2 quantum moves!")
-                    pass
-                else:
+                inp = input("Select 1 for classical or 2 for quantum move.")
+                selectedType = int(inp)
+                if self.check_type(selectedType, player):
                     return selectedType
             except:
+                if inp[0] == "K":
+                    assert sys.exit(0)
                 print("Pick correct number!")
 
-    def select_field(self, machine=False):
+    def select_field(self, selectedType, machine=False):
         selected = False
         while not selected:
             try:
                 selectedNumber = int(input("Select available field"))
-                if isinstance(self.numbers[selectedNumber], str):
-                    if "_" in self.numbers[selectedNumber]:
-                        if not len(str(self.numbers[selectedNumber])) > 6:
-                            return selectedNumber
-                        else:
-                            print("Field already filled to maximum.")
-
-                else:
+                if self.check_field(selectedNumber, selectedType):
                     return selectedNumber
             except:
                 print("Pick correct number!")
@@ -104,20 +111,19 @@ class Game():
 
     def select_and_set_field(self, player, superpos, super_iter):
         if superpos:
-            field_1 = self.select_field()
-            field_2 = self.select_field()
+            field_1 = self.select_field(2)
+            field_2 = self.select_field(2)
             self.set_superposition(field_1, field_2, player)
             self.set_field(field_1, player, True, super_iter)
             self.set_field(field_2, player, True, super_iter)
         else:
-            field = self.select_field()
+            field = self.select_field(1)
             self.set_field(field, player, False)
-
 
     def check_for_win(self, player, ending=False):
         win = False
         X_win = False
-        O_win =False
+        O_win = False
         if ending:
             for winning_comb in self.winning_combs:
                 for i in winning_comb:
@@ -171,18 +177,21 @@ class Game():
         self.print_table()
 
     def executeMachineTurn(self, field, player, type):
-        if field not in self.numbers:
-            return False
-        if type not in (1, 2):
-            return False
-        if type == 1:
-            self.set_field(field[0], player, False, False)
-            return True
-        else:
-            self.set_field(field[0], player, True, self.index[player])
-            self.set_field(field[1], player, True, self.index[player])
-            self.index[player] += 1
-            return True
+        print(field)
+        if self.check_type(type, player):
+            if type == 1:
+                if self.check_field(field[0],1):
+                    self.set_field(field[0], player, False, False)
+                    print(field[0])
+                    return True
+            else:
+                if self.check_field(field[0],2) and self.check_field(field[1],2):
+                    self.set_field(field[0], player, True, self.index[player])
+                    self.set_field(field[1], player, True, self.index[player])
+                    self.index[player] += 1
+                    print(field[0])
+                    return True
+        return False
 
 
     def set_end(self, q_res):
@@ -207,6 +216,8 @@ class Game():
                 pass
 
     def final(self):
+        print(self.superpositions)
+        print(self.superpositions_map)
         Q = QiskitCircuitMaker()
         circ = Q.set_qiskit_superpos_circ(self.superpositions)
         res = Q.measure(circ)

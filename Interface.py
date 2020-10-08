@@ -24,7 +24,7 @@ class Interface:
                 self.g.print_table()
                 win = self.g.check_for_win("X")
                 self.g.check_full()
-                self.sendResult(0,[allowed, win])
+                self.sendResult(0, [allowed, win])
             else:
                 selectedType = self.g.select_type("X")
                 self.g.executeTurn(selectedType, "X")
@@ -39,28 +39,26 @@ class Interface:
                 self.g.print_table()
                 win = self.g.check_for_win("X")
                 self.g.check_full()
-                self.sendResult(1,[allowed, win])
+                self.sendResult(1, [allowed, win])
             else:
                 selectedType = self.g.select_type("O")
                 self.g.executeTurn(selectedType, "O")
-                self.g.check_for_win("O")
                 self.g.check_full()
+                self.g.check_for_win("O")
         self.g.final()
-
 
     def sendResult(self, playerID, gameResult):
         reward = conversions.gameResultToLearningReward(gameResult[0], gameResult[1], playerID)
+        print(reward)
         if playerID == 0:
             self.ql1.saveLearningEntry(reward)
         elif playerID == 1:
             self.ql2.saveLearningEntry(reward)
 
-
     def isMachine(self, playerName):
-        if(playerName == 'X'):
-            return True
+        #if playerName == 'X':
+        #    return True
         return False
-
 
     def getAction(self, playerID):
         actionID = 0

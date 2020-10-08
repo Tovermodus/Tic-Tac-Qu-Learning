@@ -9,7 +9,9 @@ def gameResultToLearningReward(allowed, victory, playerID):
         if (victory==1 and playerID==0) or (victory==2 and playerID==1):
             return 300
         elif (victory==2 and playerID==0) or (victory==1 and playerID==1):
-            return -100        
+            return -100
+        else:
+            return 0
     else:
         return -500
 
