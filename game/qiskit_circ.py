@@ -48,21 +48,18 @@ class QiskitCircuitMaker():
         return circ
 
     def set_single_circ(self, circ, superpositions):
-
-
         superpositions_flat = []
         for i in range(len(superpositions)):
             for j in range(2):
                 superpositions_flat.append(superpositions[i][j])
 
-
         uniq, uniq_counts = np.unique(superpositions, return_counts=True, axis=None)
-
 
         true_uniq = []
         for i in range(len(uniq_counts)):
             if uniq_counts[i] == 1:
                 true_uniq.append(uniq[i])
+
 
         pos = []
         for i in range(len(true_uniq)):
@@ -71,20 +68,17 @@ class QiskitCircuitMaker():
         pos = np.array(pos)
         pos_qbits = pos // 2
 
-
-        ### find qbits that are not entagled with other qbit's
-        single_qbits, single_qbits_counts = np.unique(pos_qbits, return_counts=True)
-
+        ###find qbits, 2 mal in der liste pos_qbits vorkommen und somit nicht verschränkt sind
+        var1, var2 = np.unique(pos_qbits, return_counts=True)
         n_ent_qbits = []
-        for i in range(len(single_qbits_counts)):
-            if single_qbits_counts[i] == 2:
-                n_ent_qbits.append(i)
-
+        for i in range(len(var2)):
+            if var2[i] == 2:
+                n_ent_qbits.append(var1[i])
 
         # draw circuit for the qbits that are not entagled
         for i in range(len(n_ent_qbits)):
             circ.h(n_ent_qbits[i])
-            #circ.measure(n_ent_qbits[i], n_ent_qbits[i])
+            # circ.measure(n_ent_qbits[i], n_ent_qbits[i])
 
         return circ
 
