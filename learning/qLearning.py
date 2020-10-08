@@ -2,7 +2,11 @@ from learning.NeuralNetwork import NeuralNetwork
 import Interface
 import numpy as np
 
-
+class LearningEntry:
+    def __init__(self, playerID, state, actionID, qValue):
+        self.playerID = playerID
+        self.state = state
+        self.actionID = actionID
 
 class QLearner:
     def __init__(self, playerID):
@@ -11,6 +15,7 @@ class QLearner:
         self.learningRate = 0.5
         self.neuralNet = NeuralNetwork()
         self.explorationT = 200
+
 
     def Qvalue(self, actionID):
         return self.neuralNet.predict(np.concatenate((Interface.getCurrentState(),[actionID])))
@@ -40,6 +45,7 @@ class QLearner:
         cumProbs = np.cumsum(probabilities)
         rand = np.random.rand()
         for i in range(Interface.actions-1):
-            if(rand>cumProbs[i] && rand < cumProbs[i+1])
+            if(rand>cumProbs[i] and rand < cumProbs[i+1])
                 return i
         return 0
+
