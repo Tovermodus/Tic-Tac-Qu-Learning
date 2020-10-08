@@ -3,8 +3,6 @@
 
 #from ..Interface import *
 
-import sys
-
 from game.qiskit_circ import QiskitCircuitMaker
 
 
