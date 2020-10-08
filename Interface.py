@@ -22,8 +22,8 @@ def getReward(playerId, actionID):
 def getAction(playerId, state): #Die Hauptspielschleife fragt ab was die KI tut
     print()
 
-    #return 1,0    #klassischer Zug links oben
-    #return 2,0,1  #Superposition links oben, mitte oben
+    #return [0],1    #klassischer Zug links oben
+    #return [0,1],2  #Superposition links oben, mitte oben
 
 def getCurrentState():
     return np.zeros(statusVariables)
