@@ -77,7 +77,7 @@ def getAction(playerId, state): #Die Hauptspielschleife fragt ab was die KI tut
 def sendReward():
 
 
-def getCurrentBordState():
+def getCurrentBoardState():
     return np.zeros(statusVariables)
 
 def getStateAfterAction(playerId, actionID):

@@ -25,7 +25,7 @@ class QLearner:
         self.learningEntries = []
 
     def Qvalue(self, actionID):
-        return self.neuralNet.predict(LearningEntry(self.playerID, Interface.getCurrentbordState(), actionID, 0).compileFeature())
+        return self.neuralNet.predict(LearningEntry(self.playerID, Interface.getCurrentBoardState(), actionID, 0).compileFeature())
 
     def maximumReward(self, bordState):
         rewards = np.zeros(Interface.actions)
@@ -34,7 +34,7 @@ class QLearner:
         return np.max(rewards)
 
     def maximumFutureReward(self, actionID):
-        return self.maximumReward(Interface.getbordStateAfterAction(self.playerID, actionID))
+        return self.maximumReward(Interface.getStateAfterAction(self.playerID, actionID))
 
     def newQValue(self, actionID):
         return (1 - self.learningRate) * self.Qvalue(actionID) \
@@ -42,7 +42,7 @@ class QLearner:
                                                           actionID) + self.discountFactor * self.maximumFutureReward(actionID))
 
     def saveLearningEntry(self, actionID):
-        self.learningEntries.append(LearningEntry(self.playerID, Interface.getCurrentbordState(), actionID, self.newQValue(actionID)))
+        self.learningEntries.append(LearningEntry(self.playerID, Interface.getCurrentBoardState(), actionID, self.newQValue(actionID)))
 
     def refit(self):
         features = [le.compileFeature() for le in self.learningEntries]
