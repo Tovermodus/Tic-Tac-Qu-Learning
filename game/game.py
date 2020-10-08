@@ -1,8 +1,20 @@
 #!/usr/bin/env python3
 
 import sys
+import numpy as np
+import numpy as np
+from qiskit import *
+
+from qiskit import Aer
+from qiskit.visualization import plot_state_city
+from qiskit.visualization import plot_histogram
+from qiskit.tools.monitor import job_monitor
+from qiskit import QuantumCircuit, execute, Aer
+from qiskit.visualization import plot_histogram
 
 from qiskit import QuantumCircuit
+
+
 
 class Board():
     def __init__(self):
@@ -76,8 +88,10 @@ class Move(Board):
 
 
     def set_superposition(self, super1, super2, player):
-        self.superpositions_map[player].append([super1, super2])
-        self.superpositions.append([super1, super2])
+        lis = [super1, super2]
+        lis.sort()
+        self.superpositions_map[palyer] = lis
+        self.superpositions.append(lis)
 
     def select_and_set_field(self, player, superpos, super_iter):
         if superpos:
@@ -103,6 +117,17 @@ class Move(Board):
             if win:
                 end(player)
 
+
+
+    def set_end(self, q_res):
+        for i in range(len(self.superpositions)):
+            index = int(q_res[i])
+            pos = self.superpositions[i][index]
+            player = self.superpositions_map[f"{self.superpositions[i]}"]
+            self.numbers[pos] = player
+
+
+
 def end(winner):
     print(f"Player {winner} has won!")
     sys.exit()
@@ -110,49 +135,65 @@ def end(winner):
 
 
 
-class QiskitCircuitMaker(Board):
+class QiskitCircuitMaker():
 
-    def set_qiskit_superpos_circ(self):
+    def set_qiskit_superpos_circ(self, superpositions):
         #self.superpositions.append([0,1])
         already_set_cx = []
-        self.superpositions = [[1,2], [2,3], [1,2], [2,8]]
-        length = len(self.superpositions)
-        print(length)
+        length = len(superpositions)
+
         initial_state = [0, 1]
         circ = QuantumCircuit(length, length)
-        circ.h(0)
+
+        flag = False
+
         for i in range(length):
             for k in range(length):
-                if self.superpositions[i] == self.superpositions[k]:
-
+                if superpositions[i] == superpositions[k]:
                     if i == k:
                         continue
                     else:
-                        lis = [i, k].sort()
+                        lis = [i, k]
+                        lis.sort()
                         if not lis in already_set_cx:
+                            circ.h(i)
                             circ.initialize(initial_state, k)
                             circ.cx(i, k)
                             already_set_cx.append(lis)
-                    
+                            """superpositions = [superposition for superposition in 
+                                              superpositions if superposition != superpositions[k]]"""
+        for i in range(length):
+            for j in range(length):
+                """
+                if superpositions[i][0] not in j:
+                    continue
+                else:
+                    flag = True
+                """
+                print("")
 
-
-
-
-
+        measure_list = [i for i in range(length)]
+        circ.measure(measure_list, measure_list)
         print(circ.draw())
+        return circ
 
 
-def measure():
-    pass
+
+def measure(circ):
+    backend = Aer.get_backend('statevector_simulator')
+    job = execute(circ, backend)
+    result = job.result()
+    counts = execute(circ, Aer.get_backend('qasm_simulator'), shots=1).result().get_counts()
+    res = [i for i in counts.keys()]
+    return res[0]
 
 
 def main():
-    B = Board()
     M = Move()
     i1 = 1
     i2 = 1
     for i in range(5):
-        B.print_table()
+        M.print_table()
         selectedType = M.select_type("X")
         if selectedType == 1:
             M.select_and_set_field("X", False, False)
@@ -161,10 +202,11 @@ def main():
             M.select_and_set_field("X", True, i1)
             i1 += 1
 
-        B.print_table()
+        M.print_table()
 
         M.check_for_win("X")
-
+        if i == 4:
+            break
         selectedType = M.select_type("O")
         if selectedType == 1:
 
@@ -175,10 +217,13 @@ def main():
             i2 += 1
 
         M.check_for_win("O")
+    Q = QiskitCircuitMaker()
+    circ = Q.set_qiskit_superpos_circ(M.superpositions)
+    res = measure(circ)
+    M.set_end(res)
+    M.print_table()
 
 
 if __name__ == "__main__":
-    #main()
-    Q = QiskitCircuitMaker()
-    Q.set_qiskit_superpos_circ()
+    main()
 
