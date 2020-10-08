@@ -10,10 +10,6 @@ g = game.Game()
 statusVariables = 20
 
 
-
-def gameBoardStatusToLearningBoardStatus(gameBoardStatus):
-    print()
-
 def main(self):
     for i in range(5):
         g.print_table()
@@ -45,11 +41,6 @@ def createGameFromStatus(status):
     print()
     #board = Board()
     #board.initialize()
-def gameResultToLearningReward(gameResult):
-    print()
-
-def learningActionToGameAction(learningAction):
-    print()
 
 def sendResult(gameResult):
     print()
