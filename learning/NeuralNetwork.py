@@ -91,6 +91,8 @@ class NeuralNetworkTrainer:
 def trainedFunction(features):
     return np.sin(10*features[:,5]**2 + features[:,1])
 
+
+"""
 trainingSample = 100
 feats = np.random.rand(trainingSample, 7)#np.zeros((trainingSample, 7))#
 labels = trainedFunction(feats)
@@ -118,3 +120,4 @@ plt.show()
 plt.scatter(x[:,5], trainedFunction(x))
 plt.scatter(x[:, 5], mlp.predict(x))
 plt.show()
+"""
