@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-from ..Interface import *
+#from ..Interface import *
 from qiskit import *
 
 
@@ -229,7 +229,49 @@ class QiskitCircuitMaker():
         return circ
 
     def set_single_circ(self, circ, superpositions):
-        pass
+
+        ### create a copy of the superposition list that is flat
+        superpositions_flat = []
+        for i in range(len(superpositions)):
+            for j in range(2):
+                superpositions_flat.append(superpositions[i][j])
+
+        ### find the unique numbers in that list and how many counts of that number there are.
+        uniq, uniq_counts = np.unique(superpositions, return_counts=True, axis=None)
+
+        ### find the numbers (fields in the game) that have only one superposition on them and output
+        true_uniq = []
+        for i in range(len(uniq_counts)):
+            if uniq_counts[i] == 1:
+                true_uniq.append(uniq[i])
+
+        pos = []
+        for i in range(len(true_uniq)):
+            pos.append(superpositions_flat.index(true_uniq[i]))
+
+        pos = np.array(pos)
+        pos_qbits = pos // 2
+        # print('pos_qbits in true_uinqe fields arraay=', pos_qbits,'\n')
+
+        # print('Following fields are only ocupied by one superposition: ')
+        # for i in range(len(true_uniq)):
+        # print('Field:', true_uniq[i], 'with qbit:', pos_qbits[i])
+
+        ### find qbits that are not entagled with other qbit's
+        single_qbits, single_qbits_counts = np.unique(pos_qbits, return_counts=True)
+
+        n_ent_qbits = []
+        for i in range(len(single_qbits_counts)):
+            if single_qbits_counts[i] == 2:
+                n_ent_qbits.append(i)
+                # print('qbit:', i, 'is not entangeled')
+
+        # draw circuit for the qbits that are not entagled
+        for i in range(len(n_ent_qbits)):
+            circ.h(i)
+            circ.measure(i, i)
+
+        return circ
 
 
 def measure(circ):
@@ -253,12 +295,12 @@ def machine_input():
 def main():
 
     M = Move()
-    for i in range(5):
+    for i in range(4):
         M.print_table()
-        machine = isMachine()
+        machine = False
         if machine:
-            fields, type = getAction(1, 1)
-            M.executeMachineTurn(fields, "X" , type)
+            #fields, type = getAction(1, 1)
+            #M.executeMachineTurn(fields, "X" , type)
             M.print_table()
         else:
             selectedType = M.select_type("X")
@@ -268,8 +310,8 @@ def main():
         if i == 4:
             break
         if machine:
-            fields, type = getAction(1, 1)
-            M.executeMachineTurn(fields, "O", type)
+            #fields, type = getAction(1, 1)
+            #M.executeMachineTurn(fields, "O", type)
             M.print_table()
         else:
             selectedType = M.select_type("O")
