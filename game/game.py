@@ -2,13 +2,17 @@
 
 
 from .qiskit_circ import *
+#from ..Interface import *
 
+import sys
 
+from qiskit_circ import QiskitCircuitMaker
 
 
 class Game():
     def __init__(self):
         self.numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        self.interface_numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8]
         self.winning_combs = [[0, 1, 2], [0, 3, 6], [0, 4, 8],
                               [1, 4, 7], [2, 5, 8], [6, 7, 8],
                               [3, 4, 5], [2, 4, 6]]
@@ -17,6 +21,7 @@ class Game():
         self.superpositions_map = []
         self.superpositions = []
         self.superpositioncounter = {"X": 0, "O": 0}
+        self.only_quantum = False
 
 
         self.index = {"X": 1, "O": 1}
@@ -124,11 +129,11 @@ class Game():
                     O_win = True
                     break
             if X_win and O_win:
-                end(False)
+                self.end(False)
             elif X_win:
-                end("X")
+                self.end("X")
             elif O_win:
-                end("O")
+                self.end("O")
 
         for winning_comb in self.winning_combs:
             for i in winning_comb:
@@ -138,7 +143,7 @@ class Game():
                 else:
                     win = True
             if win:
-                end(player)
+                self.end(player)
 
     def executeTurn(self, type, player):
         if type == 1:
@@ -171,13 +176,17 @@ class Game():
 
     def check_full(self):
         if all(isinstance(x, str) for x in self.numbers):
-            self.game_full = True
-            self.final()
+            if self.superpositioncounter["X"] == 2 and self.superpositioncounter["O"] == 2:
+
+                self.game_full = True
+                self.final()
+            else:
+                pass
 
     def final(self):
         Q = QiskitCircuitMaker()
         circ = Q.set_qiskit_superpos_circ(self.superpositions)
-        res = measure(circ)
+        res = Q.measure(circ)
         self.set_end(res)
         self.print_table()
         self.check_for_win(False, True)
