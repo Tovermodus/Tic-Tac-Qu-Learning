@@ -6,7 +6,7 @@ import scipy.special as ssp
 import matplotlib.pyplot as plt
 from sklearn.neural_network import MLPRegressor
 
-inputs = 7
+inputs = 11
 firstLayerNodes = 5
 secondLayerNodes = 6
 thirdLayerNodes = 7
