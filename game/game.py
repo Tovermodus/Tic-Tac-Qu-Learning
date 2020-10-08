@@ -49,6 +49,8 @@ class Game():
                 else:
                     print("Field already filled to maximum or trying to write classical on top of superposition")
                     return False
+            else:
+                return False
         return True
 
     def select_type(self, player, machine=False):
@@ -59,8 +61,6 @@ class Game():
                 inp = input("Select 1 for classical or 2 for quantum move.")
                 selectedType = int(inp)
                 if self.check_type(selectedType, player):
-                    if selectedType == 2:
-                        self.superpositioncounter[player] += 1
                     return selectedType
             except:
                 if inp[0] == "K":
@@ -79,7 +79,6 @@ class Game():
 
     def set_field(self, selectedfield, player, superposition, superpositionnumber=1):
         if superposition:
-            self.superpositioncounter[player] += 1
             if isinstance(self.numbers[selectedfield], str):
                 self.numbers[selectedfield] = f"{self.numbers[selectedfield]} {player}_{superpositionnumber}"
                 if self.numbers[selectedfield][0] == "X" and self.numbers[selectedfield][0] == "X":
@@ -106,6 +105,7 @@ class Game():
 
 
     def set_superposition(self, super1, super2, player):
+        self.superpositioncounter[player] += 1
         lis = [super1, super2]
         lis.sort()
         self.superpositions_map.append(player)
@@ -181,6 +181,7 @@ class Game():
                     return True
             else:
                 if self.check_field(field[0],2) and self.check_field(field[1],2):
+                    self.set_superposition(field_1, field_2, player)
                     self.set_field(field[0], player, True, self.index[player])
                     self.set_field(field[1], player, True, self.index[player])
                     self.index[player] += 1
@@ -191,7 +192,10 @@ class Game():
 
     def set_end(self, q_res, superpositions):
         print(superpositions)
-        for i in range(len(superpositions)-1,0, -1):
+        print(self.superpositions)
+        print(self.superpositions_map)
+        for i in range(len(superpositions)-1,-1,-1):
+            print(i)
             index = int(q_res[i])
             pos = superpositions[i][index]
             player = self.superpositions_map[i]
