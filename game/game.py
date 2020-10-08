@@ -3,6 +3,9 @@
 import sys
 #from ..Interface import *
 from qiskit import *
+
+
+
 from qiskit import QuantumCircuit, execute, Aer
 from qiskit import QuantumCircuit
 import numpy as np
@@ -166,11 +169,25 @@ class Move(Board):
             pos = self.superpositions[i][index]
             player = self.superpositions_map[i]
             self.numbers[pos] = player
+        for i in range(len(self.numbers)):
+            if isinstance(self.numbers[i], int):
+                self.numbers[i] = ""
+            elif "X_" in self.numbers[i] or "O_" in self.numbers[i]:
+                self.numbers[i] = ""
 
     def check_full(self):
-        for i in self.numbers:
-            if not isinstance(i, int):
-                pass
+        if all(isinstance(x, str) for x in self.numbers):
+            self.game_full = True
+            self.final()
+
+    def final(self):
+        Q = QiskitCircuitMaker()
+        circ = Q.set_qiskit_superpos_circ(self.superpositions)
+        res = measure(circ)
+        self.set_end(res)
+        self.print_table()
+        self.check_for_win(False, True)
+        sys.exit()
 
 
 
@@ -291,9 +308,10 @@ def machine_input():
 def main():
 
     M = Move()
-    for i in range(4):
+    for i in range(5):
         M.print_table()
         machine = False
+        #machine = isMachine()
         if machine:
             #fields, type = getAction(1, 1)
             #M.executeMachineTurn(fields, "X" , type)
@@ -301,7 +319,7 @@ def main():
         else:
             selectedType = M.select_type("X")
             M.executeTurn(selectedType, "X")
-
+        M.check_full()
         M.check_for_win("X")
         if i == 4:
             break
@@ -313,12 +331,8 @@ def main():
             selectedType = M.select_type("O")
             M.executeTurn(selectedType, "O")
         M.check_for_win("O")
-    Q = QiskitCircuitMaker()
-    circ = Q.set_qiskit_superpos_circ(M.superpositions)
-    res = measure(circ)
-    M.set_end(res)
-    M.print_table()
-    M.check_for_win(False, True)
+        M.check_full()
+    M.final()
 
 
 
