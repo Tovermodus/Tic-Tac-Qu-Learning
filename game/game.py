@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 
 import sys
+import numpy as np
+#from ..Interface import *
 from qiskit import *
-from .interface import *
+
 
 
 from qiskit import QuantumCircuit, execute, Aer
 
 
-from qiskit import QuantumCircuit
 
 
 
@@ -169,6 +170,26 @@ class Move(Board):
             pos = self.superpositions[i][index]
             player = self.superpositions_map[i]
             self.numbers[pos] = player
+        for i in range(len(self.numbers)):
+            if isinstance(self.numbers[i], int):
+                self.numbers[i] = ""
+            elif "X_" in self.numbers[i] or "O_" in self.numbers[i]:
+                self.numbers[i] = ""
+
+    def check_full(self):
+        if all(isinstance(x, str) for x in self.numbers):
+            self.game_full = True
+            self.final()
+
+    def final(self):
+        Q = QiskitCircuitMaker()
+        circ = Q.set_qiskit_superpos_circ(self.superpositions)
+        res = measure(circ)
+        self.set_end(res)
+        self.print_table()
+        self.check_for_win(False, True)
+        sys.exit()
+
 
 
 
@@ -184,15 +205,27 @@ def end(winner):
 
 class QiskitCircuitMaker():
 
+    def __init__(self):
+        self.initial_state = [0, 1]
+
     def set_qiskit_superpos_circ(self, superpositions):
 
-        already_set_cx = []
+
         length = len(superpositions)
 
-        initial_state = [0, 1]
         circ = QuantumCircuit(length, length)
 
+        circ = self.set_double_circ(circ, superpositions)
 
+
+        measure_list = [i for i in range(length)]
+        circ.measure(measure_list, measure_list)
+        print(circ.draw())
+        return circ
+
+    def set_double_circ(self, circ, superpositions):
+        already_set_cx = []
+        length = len(superpositions)
         for i in range(length):
             for k in range(length):
                 if superpositions[i] == superpositions[k]:
@@ -203,26 +236,13 @@ class QiskitCircuitMaker():
                         lis.sort()
                         if not lis in already_set_cx:
                             circ.h(i)
-                            circ.initialize(initial_state, k)
+                            circ.initialize(self.initial_state, k)
                             circ.cx(i, k)
                             already_set_cx.append(lis)
-                            """superpositions = [superposition for superposition in 
-                                              superpositions if superposition != superpositions[k]]"""
-        for i in range(length):
-            for j in range(length):
-                """
-                if superpositions[i][0] not in j:
-                    continue
-                else:
-                    flag = True
-                """
-                print("")
-
-        measure_list = [i for i in range(length)]
-        circ.measure(measure_list, measure_list)
-        print(circ.draw())
         return circ
 
+    def set_single_circ(self, circ, superpositions):
+        pass
 
 
 def measure(circ):
@@ -236,42 +256,38 @@ def measure(circ):
     return res[0]
 
 
-def machine_input():
-    return
 
 
 
 
 def main():
+
     M = Move()
     for i in range(5):
         M.print_table()
-        machine = is_machine()
+        machine = False
+        #machine = isMachine()
         if machine:
-            fields, type = getAction()
-            M.executeMachineTurn(fields, "X" , type)
+            #fields, type = getAction(1, 1)
+            #M.executeMachineTurn(fields, "X" , type)
             M.print_table()
         else:
             selectedType = M.select_type("X")
             M.executeTurn(selectedType, "X")
-
+        M.check_full()
         M.check_for_win("X")
         if i == 4:
             break
         if machine:
-            fields, type = getAction()
-            M.executeMachineTurn(fields, "O", type)
+            #fields, type = getAction(1, 1)
+            #M.executeMachineTurn(fields, "O", type)
             M.print_table()
         else:
             selectedType = M.select_type("O")
             M.executeTurn(selectedType, "O")
         M.check_for_win("O")
-    Q = QiskitCircuitMaker()
-    circ = Q.set_qiskit_superpos_circ(M.superpositions)
-    res = measure(circ)
-    M.set_end(res)
-    M.print_table()
-    M.check_for_win(False, True)
+        M.check_full()
+    M.final()
 
 
 
