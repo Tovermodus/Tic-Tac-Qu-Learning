@@ -5,18 +5,21 @@ import numpy as np
 
 
 class LearningEntry:
-    def __init__(self, playerID, bordState, actionID, qValue):
+    def __init__(self, playerID, boardState, actionID, qValue):
         self.playerID = playerID
-        self.bordState = bordState
         self.actionID = actionID
         self.qValue = qValue
+        self.boardState = boardState
+        self.lastActionID = 0
 
     def compileFeature(self):
-        return np.concatenate((self.bordState, [self.actionID, self.playerID]))
+        return np.concatenate((self.boardState, [self.actionID, self.playerID]))
 
 
 class QLearner:
     def __init__(self, playerID):
+        self.boardState = np.zeros(Interface.statusVariables)
+        self.lastActionID = 0
         self.playerID = playerID
         self.discountFactor = 0.5
         self.learningRate = 0.5
@@ -25,7 +28,7 @@ class QLearner:
         self.learningEntries = []
 
     def Qvalue(self, actionID):
-        return self.neuralNet.predict(LearningEntry(self.playerID, Interface.getCurrentBoardState(), actionID, 0).compileFeature())
+        return self.neuralNet.predict(LearningEntry(self.playerID, self.boardState, actionID, 0).compileFeature())
 
     def maximumReward(self, bordState):
         rewards = np.zeros(Interface.actions)
@@ -36,13 +39,12 @@ class QLearner:
     def maximumFutureReward(self, actionID):
         return self.maximumReward(Interface.getStateAfterAction(self.playerID, actionID))
 
-    def newQValue(self, actionID):
+    def newQValue(self, actionID, reward):
         return (1 - self.learningRate) * self.Qvalue(actionID) \
-               + self.learningRate * (Interface.getReward(self.playerID,
-                                                          actionID) + self.discountFactor * self.maximumFutureReward(actionID))
+               + self.learningRate * (reward + self.discountFactor * self.maximumFutureReward(actionID))
 
-    def saveLearningEntry(self, actionID):
-        self.learningEntries.append(LearningEntry(self.playerID, Interface.getCurrentBoardState(), actionID, self.newQValue(actionID)))
+    def saveLearningEntry(self, reward):
+        self.learningEntries.append(LearningEntry(self.playerID, self.boardState, self.lastActionID, self.newQValue(self.lastActionID, reward)))
 
     def refit(self):
         features = [le.compileFeature() for le in self.learningEntries]
@@ -51,6 +53,8 @@ class QLearner:
         nnt.train()
 
     def nextAction(self):  # Maxwell Boltzmann Exploration
+        self.boardState = Interface.getCurrentBoardState()
+
         expProbabilities = np.zeros(Interface.actions)
         probabilities = np.zeros(Interface.actions)
         for actionID in range(Interface.actions):
@@ -61,6 +65,7 @@ class QLearner:
         rand = np.random.rand()
         for i in range(Interface.actions - 1):
             if cumProbs[i] < rand < cumProbs[i + 1]:
-                self.saveLearningEntry(i)
+                self.lastActionID = i
                 return i
+        self.lastActionID = 0
         return 0

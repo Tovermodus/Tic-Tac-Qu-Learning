@@ -161,6 +161,7 @@ class Game():
             self.set_field(field[0], player, True, self.index[player])
             self.set_field(field[1], player, True, self.index[player])
             self.index[player] += 1
+        return False
 
     def set_end(self, q_res):
         for i in range(len(self.superpositions)):
@@ -202,12 +203,8 @@ class Game():
         else:
             print("Its a tie!")
 
+    def get_board_state(self):
+        print("Not Yet Implemented")
 
-
-
-
-
-def machine_input():
-    return
 
 
