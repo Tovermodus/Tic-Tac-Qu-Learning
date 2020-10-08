@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import sys
-import qiskit as qs
-from qiskit import QuantumCircuit, execute, Aer
+
+from qiskit import QuantumCircuit
 
 class Board():
     def __init__(self):
@@ -104,7 +104,7 @@ class Move(Board):
                 end(player)
 
 def end(winner):
-    print(f"Player {winner} has won")
+    print(f"Player {winner} has won!")
     sys.exit()
 
 
@@ -112,15 +112,30 @@ def end(winner):
 
 class QiskitCircuitMaker(Board):
 
-    def set_qiskit_super(self):
-        self.superpositions.append([0,1])
+    def set_qiskit_superpos_circ(self):
+        #self.superpositions.append([0,1])
+        already_set_cx = []
+        self.superpositions = [[1,2], [2,3], [1,2], [4,8]]
         length = len(self.superpositions)
+        print(length)
+        initial_state = [0, 1]
         circ = QuantumCircuit(length, length)
         circ.h(0)
+        for i in range(length):
+            for k in range(length):
+                if self.superpositions[i] == self.superpositions[k]:
 
-        initial_state = [0, 1]
-        circ.initialize(initial_state, 1)
-        circ.cx(0, 1)
+                    if i == k:
+                        continue
+                    else:
+                        lis = [i, k].sort()
+                        if not lis in already_set_cx:
+                            circ.initialize(initial_state, k)
+                            circ.cx(i, k)
+                            already_set_cx.append(lis)
+
+
+
         print(circ.draw())
 
 
@@ -145,7 +160,7 @@ def main():
 
         B.print_table()
 
-        check_for_win("X")
+        M.check_for_win("X")
 
         selectedType = M.select_type("O")
         if selectedType == 1:
@@ -156,11 +171,11 @@ def main():
             M.select_and_set_field("O", True, i2)
             i2 += 1
 
-        check_for_win("O")
+        M.check_for_win("O")
 
 
 if __name__ == "__main__":
     #main()
     Q = QiskitCircuitMaker()
-    Q.set_qiskit_super()
+    Q.set_qiskit_superpos_circ()
 
