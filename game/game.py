@@ -11,7 +11,7 @@ from qiskit_circ import QiskitCircuitMaker
 class Game():
     def __init__(self):
         self.numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-        self.interface_numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        self.interface_numbers = [0, 0, 0, 0, 0, 0, 0, 0, 0]
         self.winning_combs = [[0, 1, 2], [0, 3, 6], [0, 4, 8],
                               [1, 4, 7], [2, 5, 8], [6, 7, 8],
                               [3, 4, 5], [2, 4, 6]]
@@ -74,12 +74,27 @@ class Game():
         if superposition:
             self.superpositioncounter[player] += 1
             if isinstance(self.numbers[selectedfield], str):
-
                 self.numbers[selectedfield] = f"{self.numbers[selectedfield]} {player}_{superpositionnumber}"
+                if self.numbers[selectedfield][0] == "X" and self.numbers[selectedfield][0] == "X":
+                    self.interface_numbers[selectedfield] = 4
+                if self.numbers[selectedfield][0] == "O" and self.numbers[selectedfield][0] == "O":
+                    self.interface_numbers[selectedfield] = 5
+                if self.numbers[selectedfield][0] == "X" and self.numbers[selectedfield][0] == "O":
+                    self.interface_numbers[selectedfield] = 3
+                if self.numbers[selectedfield][0] == "O" and self.numbers[selectedfield][0] == "X":
+                    self.interface_numbers[selectedfield] = 3
             else:
                 self.numbers[selectedfield] = player + f"_{superpositionnumber}"
+                if self.numbers[selectedfield][0] == "O":
+                    self.interface_numbers[selectedfield] = 2
+                if self.numbers[selectedfield][0] == "X":
+                    self.interface_numbers[selectedfield] = 1
         else:
             self.numbers[selectedfield] = player
+            if player == "X":
+                self.interface_numbers[selectedfield] = 6
+            if player == "O":
+                self.interface_numbers[selectedfield] = 7
 
 
 
@@ -127,12 +142,16 @@ class Game():
                 if win:
                     O_win = True
                     break
+
             if X_win and O_win:
                 self.end(False)
+                return 0
             elif X_win:
                 self.end("X")
+                return 1
             elif O_win:
                 self.end("O")
+                return -1
 
         for winning_comb in self.winning_combs:
             for i in winning_comb:
@@ -142,7 +161,7 @@ class Game():
                 else:
                     win = True
             if win:
-                self.end(player)
+                winner = self.end(player)
 
     def executeTurn(self, type, player):
         if type == 1:
@@ -154,12 +173,19 @@ class Game():
         self.print_table()
 
     def executeMachineTurn(self, field, player, type):
+        if field not in self.numbers:
+            return False
+        if type not in (1, 2):
+            return False
         if type == 1:
             self.set_field(field[0], player, False, False)
+            return True
         else:
             self.set_field(field[0], player, True, self.index[player])
             self.set_field(field[1], player, True, self.index[player])
             self.index[player] += 1
+            return True
+
 
     def set_end(self, q_res):
         for i in range(len(self.superpositions)):
@@ -175,7 +201,7 @@ class Game():
 
     def check_full(self):
         if all(isinstance(x, str) for x in self.numbers):
-            if self.superpositioncounter["X"] == 2 and self.superpositioncounter["O"] == 2:
+            if self.superpositioncounter["X"] > 1 and self.superpositioncounter["O"] > 2:
 
                 self.game_full = True
                 self.final()
@@ -188,8 +214,11 @@ class Game():
         res = Q.measure(circ)
         self.set_end(res)
         self.print_table()
-        self.check_for_win(False, True)
-        sys.exit()
+        winner = self.check_for_win(False, True)
+        print(self.interface_numbers)
+        return winner
+
+
 
 
 
@@ -197,13 +226,15 @@ class Game():
     def end(self, winner):
         if winner:
             print(f"Player {winner} has won!")
-            sys.exit()
+            if winner == "X":
+                return 1
+            elif winner == "O"
+                return -1
         else:
             print("Its a tie!")
+            return 0
 
     def main(self):
-
-
         for i in range(5):
             self.print_table()
             machine = False
@@ -216,7 +247,7 @@ class Game():
                 selectedType = self.select_type("X")
                 self.executeTurn(selectedType, "X")
             self.check_full()
-            self.check_for_win("X")
+            winner = self.check_for_win("X")
             if i == 4:
                 break
             if machine:
@@ -226,9 +257,10 @@ class Game():
             else:
                 selectedType = self.select_type("O")
                 self.executeTurn(selectedType, "O")
-            self.check_for_win("O")
+            winner = self.check_for_win("O")
             self.check_full()
-        self.final()
+        winner = self.final()
+
 
 
 
