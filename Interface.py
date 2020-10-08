@@ -7,17 +7,9 @@ actions = 30
 statusVariables = 20
 
 
-def createGameFromStatus(status):
-    board = Board()
-    board.initialize()
 
 def getReward(playerId, actionID):
     print()
-
-
-
-
-
 
 def getAction(playerId, state): #Die Hauptspielschleife fragt ab was die KI tut
     print()
@@ -29,4 +21,4 @@ def getCurrentState():
     return np.zeros(statusVariables)
 
 def getStateAfterAction(playerId, actionID):
-
+    print()
