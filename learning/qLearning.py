@@ -5,14 +5,14 @@ import numpy as np
 
 
 class LearningEntry:
-    def __init__(self, playerID, state, actionID, qValue):
+    def __init__(self, playerID, bordState, actionID, qValue):
         self.playerID = playerID
-        self.state = state
+        self.bordState = bordState
         self.actionID = actionID
         self.qValue = qValue
 
     def compileFeature(self):
-        return np.concatenate((self.state, [self.actionID, self.playerID]))
+        return np.concatenate((self.bordState, [self.actionID, self.playerID]))
 
 
 class QLearner:
@@ -25,24 +25,24 @@ class QLearner:
         self.learningEntries = []
 
     def Qvalue(self, actionID):
-        return self.neuralNet.predict(LearningEntry(self.playerID, Interface.getCurrentState(), actionID, 0).compileFeature())
+        return self.neuralNet.predict(LearningEntry(self.playerID, Interface.getCurrentbordState(), actionID, 0).compileFeature())
 
-    def maximumReward(self, state):
+    def maximumReward(self, bordState):
         rewards = np.zeros(Interface.actions)
         for actionID in range(Interface.actions):
             rewards[actionID] = self.Qvalue(actionID)
         return np.max(rewards)
 
     def maximumFutureReward(self, actionID):
-        return self.maximumReward(Interface.getStateAfterAction(self.playerID, actionID))
+        return self.maximumReward(Interface.getbordStateAfterAction(self.playerID, actionID))
 
     def newQValue(self, actionID):
         return (1 - self.learningRate) * self.Qvalue(actionID) \
                + self.learningRate * (Interface.getReward(self.playerID,
                                                           actionID) + self.discountFactor * self.maximumFutureReward(actionID))
 
-    def saveAction(self, actionID):
-        self.learningEntries.append(LearningEntry(self.playerID, Interface.getCurrentState(), actionID, self.newQValue(actionID)))
+    def saveLearningEntry(self, actionID):
+        self.learningEntries.append(LearningEntry(self.playerID, Interface.getCurrentbordState(), actionID, self.newQValue(actionID)))
 
     def refit(self):
         features = [le.compileFeature() for le in self.learningEntries]
@@ -61,6 +61,6 @@ class QLearner:
         rand = np.random.rand()
         for i in range(Interface.actions - 1):
             if cumProbs[i] < rand < cumProbs[i + 1]:
-                self.saveAction(i)
+                self.saveLearningEntry(i)
                 return i
         return 0
