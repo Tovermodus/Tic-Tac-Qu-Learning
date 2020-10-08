@@ -49,8 +49,6 @@ class Game():
                 else:
                     print("Field already filled to maximum or trying to write classical on top of superposition")
                     return False
-            else:
-                return False
         return True
 
     def select_type(self, player, machine=False):
@@ -81,6 +79,7 @@ class Game():
 
     def set_field(self, selectedfield, player, superposition, superpositionnumber=1):
         if superposition:
+            self.superpositioncounter[player] += 1
             if isinstance(self.numbers[selectedfield], str):
                 self.numbers[selectedfield] = f"{self.numbers[selectedfield]} {player}_{superpositionnumber}"
                 if self.numbers[selectedfield][0] == "X" and self.numbers[selectedfield][0] == "X":
@@ -171,7 +170,6 @@ class Game():
             self.select_and_set_field(player, True, self.index[player])
             self.index[player] += 1
         self.print_table()
-        print(self.numbers)
 
     def executeMachineTurn(self, field, player, type):
         print(field)
@@ -183,7 +181,6 @@ class Game():
                     return True
             else:
                 if self.check_field(field[0],2) and self.check_field(field[1],2):
-                    self.set_superposition(field[0], field[1], player)
                     self.set_field(field[0], player, True, self.index[player])
                     self.set_field(field[1], player, True, self.index[player])
                     self.index[player] += 1
@@ -216,6 +213,8 @@ class Game():
                 pass
 
     def final(self):
+        print(self.superpositions)
+        print(self.superpositions_map)
         Q = QiskitCircuitMaker()
         circ, superpositions = Q.set_qiskit_superpos_circ(self.superpositions)
         res = Q.measure(circ)
