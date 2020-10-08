@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
 
 import sys
-import numpy as np
-import numpy as np
 from qiskit import *
+from .interface import *
 
-from qiskit import Aer
-from qiskit.visualization import plot_state_city
-from qiskit.visualization import plot_histogram
-from qiskit.tools.monitor import job_monitor
+
 from qiskit import QuantumCircuit, execute, Aer
-from qiskit.visualization import plot_histogram
+
 
 from qiskit import QuantumCircuit
 
@@ -29,6 +25,7 @@ class Board():
         self.superpositioncounter = {"X": 0, "O": 0}
 
 
+        self.index = {"X": 1, "O": 1}
 
     def print_table(self):
 
@@ -42,7 +39,8 @@ class Board():
 
 class Move(Board):
 
-    def select_type(self, player):
+
+    def select_type(self, player, machine=False):
         selected = False
         while not selected:
             try:
@@ -57,7 +55,7 @@ class Move(Board):
             except:
                 print("Pick correct number!")
 
-    def select_field(self):
+    def select_field(self, machine=False):
         selected = False
         while not selected:
             try:
@@ -105,8 +103,39 @@ class Move(Board):
             self.set_field(field, player, False)
 
 
-    def check_for_win(self, player):
+    def check_for_win(self, player, ending=False):
         win = False
+        X_win = False
+        O_win =False
+        if ending:
+            for winning_comb in self.winning_combs:
+                for i in winning_comb:
+                    if self.numbers[i] != "X":
+                        win = False
+                        break
+                    else:
+                        win = True
+                if win:
+                    X_win = True
+                    break
+            win = False
+            for winning_comb in self.winning_combs:
+                for i in winning_comb:
+                    if self.numbers[i] != "O":
+                        win = False
+                        break
+                    else:
+                        win = True
+                if win:
+                    O_win = True
+                    break
+            if X_win and O_win:
+                end(False)
+            elif X_win:
+                end("X")
+            elif O_win:
+                end("O")
+
         for winning_comb in self.winning_combs:
             for i in winning_comb:
                 if self.numbers[i] != player:
@@ -117,7 +146,22 @@ class Move(Board):
             if win:
                 end(player)
 
+    def executeTurn(self, type, player):
+        if type == 1:
+            self.select_and_set_field(player, False, False)
+        else:
 
+            self.select_and_set_field(player, True, self.index[player])
+            self.index[player] += 1
+        self.print_table()
+
+    def executeMachineTurn(self, field, player, type):
+        if type == 1:
+            self.set_field(field[0], player, False, False)
+        else:
+            self.set_field(field[0], player, True, self.index[player])
+            self.set_field(field[1], player, True, self.index[player])
+            self.index[player] += 1
 
     def set_end(self, q_res):
         for i in range(len(self.superpositions)):
@@ -129,8 +173,11 @@ class Move(Board):
 
 
 def end(winner):
-    print(f"Player {winner} has won!")
-    sys.exit()
+    if winner:
+        print(f"Player {winner} has won!")
+        sys.exit()
+    else:
+        print("Its a tie!")
 
 
 
@@ -138,14 +185,13 @@ def end(winner):
 class QiskitCircuitMaker():
 
     def set_qiskit_superpos_circ(self, superpositions):
-        #self.superpositions.append([0,1])
+
         already_set_cx = []
         length = len(superpositions)
 
         initial_state = [0, 1]
         circ = QuantumCircuit(length, length)
 
-        flag = False
 
         for i in range(length):
             for k in range(length):
@@ -190,42 +236,48 @@ def measure(circ):
     return res[0]
 
 
+def machine_input():
+    return
+
+
+
+
 def main():
     M = Move()
-    i1 = 1
-    i2 = 1
     for i in range(5):
         M.print_table()
-        selectedType = M.select_type("X")
-        if selectedType == 1:
-            M.select_and_set_field("X", False, False)
+        machine = is_machine()
+        if machine:
+            fields, type = getAction()
+            M.executeMachineTurn(fields, "X" , type)
+            M.print_table()
         else:
-
-            M.select_and_set_field("X", True, i1)
-            i1 += 1
-
-        M.print_table()
+            selectedType = M.select_type("X")
+            M.executeTurn(selectedType, "X")
 
         M.check_for_win("X")
         if i == 4:
             break
-        selectedType = M.select_type("O")
-        if selectedType == 1:
-
-            M.select_and_set_field("O", False, False)
-
+        if machine:
+            fields, type = getAction()
+            M.executeMachineTurn(fields, "O", type)
+            M.print_table()
         else:
-            M.select_and_set_field("O", True, i2)
-            i2 += 1
-
+            selectedType = M.select_type("O")
+            M.executeTurn(selectedType, "O")
         M.check_for_win("O")
     Q = QiskitCircuitMaker()
     circ = Q.set_qiskit_superpos_circ(M.superpositions)
     res = measure(circ)
     M.set_end(res)
     M.print_table()
+    M.check_for_win(False, True)
+
+
+
 
 
 if __name__ == "__main__":
     main()
+
 
