@@ -12,6 +12,7 @@ class QLearner:
         self.neuralNet = NeuralNetwork()
         self.explorationT = 200
 
+
     def Qvalue(self, actionID):
         return self.neuralNet.predict(np.concatenate((Interface.getCurrentState(),[actionID])))
 
