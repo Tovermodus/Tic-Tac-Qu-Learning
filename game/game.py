@@ -115,7 +115,7 @@ class QiskitCircuitMaker(Board):
     def set_qiskit_superpos_circ(self):
         #self.superpositions.append([0,1])
         already_set_cx = []
-        self.superpositions = [[1,2], [2,3], [1,2], [4,8]]
+        self.superpositions = [[1,2], [2,3], [1,2], [2,8]]
         length = len(self.superpositions)
         print(length)
         initial_state = [0, 1]
@@ -133,6 +133,9 @@ class QiskitCircuitMaker(Board):
                             circ.initialize(initial_state, k)
                             circ.cx(i, k)
                             already_set_cx.append(lis)
+                    
+
+
 
 
 
