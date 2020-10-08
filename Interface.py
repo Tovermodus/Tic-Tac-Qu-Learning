@@ -23,12 +23,12 @@ class Interface:
                 allowed = self.g.executeMachineTurn(fields, "X", type)
                 self.g.print_table()
                 win = self.g.check_for_win("X")
-                self.g.check_full()
+                self.g.check_full("X")
                 self.sendResult(0, [allowed, win])
             else:
                 selectedType = self.g.select_type("X")
                 self.g.executeTurn(selectedType, "X")
-                self.g.check_full()
+                self.g.check_full("X")
                 self.g.check_for_win("X")
 
             if i == 4:
@@ -38,12 +38,12 @@ class Interface:
                 allowed = self.g.executeMachineTurn(fields, "O", type)
                 self.g.print_table()
                 win = self.g.check_for_win("X")
-                self.g.check_full()
+                self.g.check_full("O")
                 self.sendResult(1, [allowed, win])
             else:
                 selectedType = self.g.select_type("O")
                 self.g.executeTurn(selectedType, "O")
-                self.g.check_full()
+                self.g.check_full("O")
                 self.g.check_for_win("O")
         self.g.final()
 

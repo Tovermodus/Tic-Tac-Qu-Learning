@@ -49,8 +49,6 @@ class Game():
                 else:
                     print("Field already filled to maximum or trying to write classical on top of superposition")
                     return False
-            else:
-                return False
         return True
 
     def select_type(self, player, machine=False):
@@ -61,6 +59,8 @@ class Game():
                 inp = input("Select 1 for classical or 2 for quantum move.")
                 selectedType = int(inp)
                 if self.check_type(selectedType, player):
+                    if selectedType == 2:
+                        self.superpositioncounter[player] += 1
                     return selectedType
             except:
                 if inp[0] == "K":
@@ -127,27 +127,9 @@ class Game():
         X_win = False
         O_win = False
         if ending:
-            for winning_comb in self.winning_combs:
-                for i in winning_comb:
-                    if self.numbers[i] != "X":
-                        win = False
-                        break
-                    else:
-                        win = True
-                if win:
-                    X_win = True
-                    break
-            win = False
-            for winning_comb in self.winning_combs:
-                for i in winning_comb:
-                    if self.numbers[i] != "O":
-                        win = False
-                        break
-                    else:
-                        win = True
-                if win:
-                    O_win = True
-                    break
+            X_win = self.check_for_win_comb("X")
+
+            O_win = self.check_for_win_comb("X")
 
             if X_win and O_win:
                 self.end(False)
@@ -159,6 +141,15 @@ class Game():
                 self.end("O")
                 return -1
 
+        win = self.check_for_win_comb(player)
+        if win:
+            winner = self.end(player)
+            return winner
+        else:
+            return False
+
+    def check_for_win_comb(self, player):
+        win = False
         for winning_comb in self.winning_combs:
             for i in winning_comb:
                 if self.numbers[i] != player:
@@ -167,7 +158,9 @@ class Game():
                 else:
                     win = True
             if win:
-                winner = self.end(player)
+                return True
+        return False
+
 
     def executeTurn(self, type, player):
         if type == 1:
@@ -177,7 +170,6 @@ class Game():
             self.select_and_set_field(player, True, self.index[player])
             self.index[player] += 1
         self.print_table()
-        print(self.numbers)
 
     def executeMachineTurn(self, field, player, type):
         print(field)
@@ -189,7 +181,6 @@ class Game():
                     return True
             else:
                 if self.check_field(field[0],2) and self.check_field(field[1],2):
-                    self.set_superposition(field[0], field[1], player)
                     self.set_field(field[0], player, True, self.index[player])
                     self.set_field(field[1], player, True, self.index[player])
                     self.index[player] += 1
@@ -198,10 +189,11 @@ class Game():
         return False
 
 
-    def set_end(self, q_res):
-        for i in range(len(self.superpositions)):
+    def set_end(self, q_res, superpositions):
+        print(superpositions)
+        for i in range(len(superpositions)-1,0, -1):
             index = int(q_res[i])
-            pos = self.superpositions[i][index]
+            pos = superpositions[i][index]
             player = self.superpositions_map[i]
             self.numbers[pos] = player
         for i in range(len(self.numbers)):
@@ -210,9 +202,10 @@ class Game():
             elif "X_" in self.numbers[i] or "O_" in self.numbers[i]:
                 self.numbers[i] = ""
 
-    def check_full(self):
+    def check_full(self, player):
         if all(isinstance(x, str) for x in self.numbers):
-            if self.superpositioncounter["X"] > 1 and self.superpositioncounter["O"] > 2:
+            print(self.superpositioncounter[player])
+            if self.superpositioncounter[player] == 2:
 
                 self.game_full = True
                 self.final()
@@ -223,16 +216,13 @@ class Game():
         print(self.superpositions)
         print(self.superpositions_map)
         Q = QiskitCircuitMaker()
-        circ = Q.set_qiskit_superpos_circ(self.superpositions)
+        circ, superpositions = Q.set_qiskit_superpos_circ(self.superpositions)
         res = Q.measure(circ)
-        self.set_end(res)
+        self.set_end(res, superpositions)
         self.print_table()
         winner = self.check_for_win(False, True)
         print(self.interface_numbers)
         return winner
-
-
-
 
 
 
