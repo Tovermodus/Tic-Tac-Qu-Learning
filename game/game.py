@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 import sys
+from ..Interface import *
 from qiskit import *
-from .interface import *
+
 
 
 from qiskit import QuantumCircuit, execute, Aer
@@ -170,6 +171,12 @@ class Move(Board):
             player = self.superpositions_map[i]
             self.numbers[pos] = player
 
+    def check_full(self):
+        for i in self.numbers:
+            if not isinstance(i, int):
+                pass
+
+
 
 
 def end(winner):
@@ -184,15 +191,28 @@ def end(winner):
 
 class QiskitCircuitMaker():
 
+    def __init__(self):
+        self.initial_state = [0, 1]
+
     def set_qiskit_superpos_circ(self, superpositions):
 
-        already_set_cx = []
+
         length = len(superpositions)
 
         initial_state = [0, 1]
         circ = QuantumCircuit(length, length)
 
+        circ = self.set_double_circ(circ, superpositions)
 
+
+        measure_list = [i for i in range(length)]
+        circ.measure(measure_list, measure_list)
+        print(circ.draw())
+        return circ
+
+    def set_double_circ(self, circ, superpositions):
+        already_set_cx = []
+        length = len(superpositions)
         for i in range(length):
             for k in range(length):
                 if superpositions[i] == superpositions[k]:
@@ -203,26 +223,13 @@ class QiskitCircuitMaker():
                         lis.sort()
                         if not lis in already_set_cx:
                             circ.h(i)
-                            circ.initialize(initial_state, k)
+                            circ.initialize(self.initial_state, k)
                             circ.cx(i, k)
                             already_set_cx.append(lis)
-                            """superpositions = [superposition for superposition in 
-                                              superpositions if superposition != superpositions[k]]"""
-        for i in range(length):
-            for j in range(length):
-                """
-                if superpositions[i][0] not in j:
-                    continue
-                else:
-                    flag = True
-                """
-                print("")
-
-        measure_list = [i for i in range(length)]
-        circ.measure(measure_list, measure_list)
-        print(circ.draw())
         return circ
 
+    def set_single_circ(self, circ, superpositions):
+        pass
 
 
 def measure(circ):
@@ -242,13 +249,15 @@ def machine_input():
 
 
 
+
 def main():
+
     M = Move()
     for i in range(5):
         M.print_table()
-        machine = is_machine()
+        machine = isMachine()
         if machine:
-            fields, type = getAction()
+            fields, type = getAction(1, 1)
             M.executeMachineTurn(fields, "X" , type)
             M.print_table()
         else:
@@ -259,7 +268,7 @@ def main():
         if i == 4:
             break
         if machine:
-            fields, type = getAction()
+            fields, type = getAction(1, 1)
             M.executeMachineTurn(fields, "O", type)
             M.print_table()
         else:

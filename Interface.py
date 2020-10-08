@@ -16,7 +16,8 @@ def getReward(playerId, actionID):
 
 
 
-
+def isMachine():
+    return False
 
 
 def getAction(playerId, state): #Die Hauptspielschleife fragt ab was die KI tut
