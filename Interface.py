@@ -7,6 +7,12 @@ statusVariables = 20
 ql1 = learning.QLearner(0)
 ql2 = learning.QLearner(1)
 g = game.Game()
+statusVariables = 20
+
+
+
+def gameBoardStatusToLearningBoardStatus(gameBoardStatus):
+    print()
 
 def main(self):
     for i in range(5):
@@ -39,8 +45,13 @@ def createGameFromStatus(status):
     print()
     #board = Board()
     #board.initialize()
+def gameResultToLearningReward(gameResult):
+    print()
 
-def getReward(playerId, actionID):
+def learningActionToGameAction(learningAction):
+    print()
+
+def sendResult(gameResult):
     print()
 
 
@@ -50,12 +61,23 @@ def isMachine():
 
 
 def getAction(playerId, state): #Die Hauptspielschleife fragt ab was die KI tut
+def getReward(playerId, actionID):
     print()
 
     #return [0],1    #klassischer Zug links oben
     #return [0,1],2  #Superposition links oben, mitte oben
 
 def getCurrentState():
+    return np.zeros(statusVariables)
+def getAction(playerId, state): #Die Hauptspielschleife fragt ab was die KI tut
+    print()
+
+    #return [0],1    #klassischer Zug links oben
+    #return [0,1],2  #Superposition links oben, mitte oben
+def sendReward():
+
+
+def getCurrentBordState():
     return np.zeros(statusVariables)
 
 def getStateAfterAction(playerId, actionID):
