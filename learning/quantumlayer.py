@@ -42,7 +42,7 @@ class activation_function:
         states = np.array(list(result.keys()))
 
         # sum up all probabilities that imply, that qubit k collapses to 1
-        results =[sum([probabilities[i] for i in range(len(probabilities)) if states[i][k] == "1"]) for k in range(self.secondLayerNodes)]
+        results =np.array([sum([probabilities[i] for i in range(len(probabilities)) if states[i][k] == "1"]) for k in range(self.secondLayerNodes)])
         return results
     
 #%%
