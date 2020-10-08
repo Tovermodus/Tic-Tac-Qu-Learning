@@ -56,8 +56,8 @@ class Interface:
             self.ql2.saveLearningEntry(reward)
 
     def isMachine(self, playerName):
-        #if playerName == 'X':
-        #    return True
+        if playerName == 'X':
+            return True
         return False
 
     def getAction(self, playerID):
