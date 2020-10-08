@@ -3,13 +3,9 @@
 import sys
 #from ..Interface import *
 from qiskit import *
-
-
-
 from qiskit import QuantumCircuit, execute, Aer
-
-
 from qiskit import QuantumCircuit
+import numpy as np
 
 
 
@@ -204,7 +200,7 @@ class QiskitCircuitMaker():
 
         circ = self.set_double_circ(circ, superpositions)
 
-
+        circ = self.set_single_circ(circ, superpositions)
         measure_list = [i for i in range(length)]
         circ.measure(measure_list, measure_list)
         print(circ.draw())
@@ -239,7 +235,7 @@ class QiskitCircuitMaker():
         ### find the unique numbers in that list and how many counts of that number there are.
         uniq, uniq_counts = np.unique(superpositions, return_counts=True, axis=None)
 
-        ### find the numbers (fields in the game) that have only one superposition on them and output
+        # find the numbers (fields in the game) that have only one superposition on them and output
         true_uniq = []
         for i in range(len(uniq_counts)):
             if uniq_counts[i] == 1:
@@ -268,8 +264,8 @@ class QiskitCircuitMaker():
 
         # draw circuit for the qbits that are not entagled
         for i in range(len(n_ent_qbits)):
-            circ.h(i)
-            circ.measure(i, i)
+            circ.h(n_ent_qbits[i])
+            #circ.measure(n_ent_qbits[i], n_ent_qbits[i])
 
         return circ
 
