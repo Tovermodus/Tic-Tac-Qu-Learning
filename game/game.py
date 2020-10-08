@@ -181,7 +181,7 @@ class Game():
                     return True
             else:
                 if self.check_field(field[0],2) and self.check_field(field[1],2):
-                    self.set_superposition(field_1, field_2, player)
+                    self.set_superposition(field[0], field[0], player)
                     self.set_field(field[0], player, True, self.index[player])
                     self.set_field(field[1], player, True, self.index[player])
                     self.index[player] += 1
