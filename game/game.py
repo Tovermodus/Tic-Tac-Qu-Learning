@@ -36,7 +36,9 @@ class Game():
     def check_type(self, selectedType, player):
         if selectedType not in [1, 2]:
             return False
-        elif selectedType == 2 and self.superpositioncounter[player] > 2:
+        if selectedType == 2:
+            self.superpositioncounter[player] += 1
+        elif selectedType == 2 and self.superpositioncounter[player] == 2:
             print("You've already made 2 quantum moves!")
             return False
         return True
@@ -79,7 +81,7 @@ class Game():
 
     def set_field(self, selectedfield, player, superposition, superpositionnumber=1):
         if superposition:
-            self.superpositioncounter[player] += 1
+
             if isinstance(self.numbers[selectedfield], str):
                 self.numbers[selectedfield] = f"{self.numbers[selectedfield]} {player}_{superpositionnumber}"
                 if self.numbers[selectedfield][0] == "X" and self.numbers[selectedfield][0] == "X":
@@ -212,7 +214,7 @@ class Game():
 
     def check_full(self):
         if all(isinstance(x, str) for x in self.numbers):
-            if self.superpositioncounter["X"] > 1 and self.superpositioncounter["O"] > 2:
+            if self.superpositioncounter["X"] == 2 and self.superpositioncounter["O"] == 2:
 
                 self.game_full = True
                 self.final()

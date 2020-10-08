@@ -45,6 +45,7 @@ class QiskitCircuitMaker():
                             circ.initialize(self.initial_state, k)
                             circ.cx(i, k)
                             already_set_cx.append(lis)
+                            print('already set cx =', already_set_cx)
         return circ
 
     def set_single_circ(self, circ, superpositions):
