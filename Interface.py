@@ -75,7 +75,7 @@ def getAction(playerID):
 
 
 def getCurrentBoardState():
-    return conversions.gameBoardStatusToLearningBoardStatus(g.get_board_state())
+    return g.get_board_state()
 
 
 def getStateAfterAction(playerID, actionID):
@@ -85,7 +85,7 @@ def getStateAfterAction(playerID, actionID):
         copygame.executeMachineTurn(fields, "X", type)
     elif playerID == 1:
         copygame.executeMachineTurn(fields, "X", type)
-    return conversions.gameBoardStatusToLearningBoardStatus(copygame.get_board_state())
+    return copygame.get_board_state()
 
 
 if __name__ == "__main__":

@@ -204,7 +204,7 @@ class Game():
             print("Its a tie!")
 
     def get_board_state(self):
-        print("Not Yet Implemented")
+        return self.interface_numbers
 
 
 

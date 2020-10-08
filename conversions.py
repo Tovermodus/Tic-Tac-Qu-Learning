@@ -1,7 +1,4 @@
 
-def gameBoardStatusToLearningBoardStatus(gameBoardStatus):
-    print()
-
 def gameResultToLearningReward(gameResult):
     print()
 
