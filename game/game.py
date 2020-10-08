@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
 
-import sys
+
 #from ..Interface import *
-from qiskit import *
+
+from .qiskit_circ import *
 
 
 
-from qiskit import QuantumCircuit, execute, Aer
-from qiskit import QuantumCircuit
-import numpy as np
 
-
-
-class Board():
+class Game():
     def __init__(self):
         self.numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8]
         self.winning_combs = [[0, 1, 2], [0, 3, 6], [0, 4, 8],
@@ -37,7 +33,7 @@ class Board():
                 continue
             print("  ________ ________ ________")
 
-class Move(Board):
+
 
 
     def select_type(self, player, machine=False):
@@ -192,153 +188,52 @@ class Move(Board):
 
 
 
-def end(winner):
-    if winner:
-        print(f"Player {winner} has won!")
-        sys.exit()
-    else:
-        print("Its a tie!")
+    def end(self, winner):
+        if winner:
+            print(f"Player {winner} has won!")
+            sys.exit()
+        else:
+            print("Its a tie!")
+
+    def main(self):
+
+
+        for i in range(5):
+            self.print_table()
+            machine = False
+            # machine = isMachine()
+            if machine:
+                # fields, type = getAction(1, 1)
+                # M.executeMachineTurn(fields, "X" , type)
+                self.print_table()
+            else:
+                selectedType = self.select_type("X")
+                self.executeTurn(selectedType, "X")
+            self.check_full()
+            self.check_for_win("X")
+            if i == 4:
+                break
+            if machine:
+                # fields, type = getAction(1, 1)
+                # M.executeMachineTurn(fields, "O", type)
+                self.print_table()
+            else:
+                selectedType = self.select_type("O")
+                self.executeTurn(selectedType, "O")
+            self.check_for_win("O")
+            self.check_full()
+        self.final()
 
 
 
-
-class QiskitCircuitMaker():
-
-    def __init__(self):
-        self.initial_state = [0, 1]
-
-    def set_qiskit_superpos_circ(self, superpositions):
-
-
-        length = len(superpositions)
-
-        initial_state = [0, 1]
-        circ = QuantumCircuit(length, length)
-
-        circ = self.set_double_circ(circ, superpositions)
-
-        circ = self.set_single_circ(circ, superpositions)
-        measure_list = [i for i in range(length)]
-        circ.measure(measure_list, measure_list)
-        print(circ.draw())
-        return circ
-
-    def set_double_circ(self, circ, superpositions):
-        already_set_cx = []
-        length = len(superpositions)
-        for i in range(length):
-            for k in range(length):
-                if superpositions[i] == superpositions[k]:
-                    if i == k:
-                        continue
-                    else:
-                        lis = [i, k]
-                        lis.sort()
-                        if not lis in already_set_cx:
-                            circ.h(i)
-                            circ.initialize(self.initial_state, k)
-                            circ.cx(i, k)
-                            already_set_cx.append(lis)
-        return circ
-
-    def set_single_circ(self, circ, superpositions):
-
-        ### create a copy of the superposition list that is flat
-        superpositions_flat = []
-        for i in range(len(superpositions)):
-            for j in range(2):
-                superpositions_flat.append(superpositions[i][j])
-
-        ### find the unique numbers in that list and how many counts of that number there are.
-        uniq, uniq_counts = np.unique(superpositions, return_counts=True, axis=None)
-
-        # find the numbers (fields in the game) that have only one superposition on them and output
-        true_uniq = []
-        for i in range(len(uniq_counts)):
-            if uniq_counts[i] == 1:
-                true_uniq.append(uniq[i])
-
-        pos = []
-        for i in range(len(true_uniq)):
-            pos.append(superpositions_flat.index(true_uniq[i]))
-
-        pos = np.array(pos)
-        pos_qbits = pos // 2
-        # print('pos_qbits in true_uinqe fields arraay=', pos_qbits,'\n')
-
-        # print('Following fields are only ocupied by one superposition: ')
-        # for i in range(len(true_uniq)):
-        # print('Field:', true_uniq[i], 'with qbit:', pos_qbits[i])
-
-        ### find qbits that are not entagled with other qbit's
-        single_qbits, single_qbits_counts = np.unique(pos_qbits, return_counts=True)
-
-        n_ent_qbits = []
-        for i in range(len(single_qbits_counts)):
-            if single_qbits_counts[i] == 2:
-                n_ent_qbits.append(i)
-                # print('qbit:', i, 'is not entangeled')
-
-        # draw circuit for the qbits that are not entagled
-        for i in range(len(n_ent_qbits)):
-            circ.h(n_ent_qbits[i])
-            #circ.measure(n_ent_qbits[i], n_ent_qbits[i])
-
-        return circ
-
-
-def measure(circ):
-    backend = Aer.get_backend('statevector_simulator')
-    job = execute(circ, backend)
-    result = job.result()
-    counts = execute(circ, Aer.get_backend('qasm_simulator'), shots=1).result().get_counts()
-    print(counts)
-    res = [i for i in counts.keys()]
-    print(res)
-    return res[0]
 
 
 def machine_input():
     return
 
 
-
-
-
-def main():
-
-    M = Move()
-    for i in range(5):
-        M.print_table()
-        machine = False
-        #machine = isMachine()
-        if machine:
-            #fields, type = getAction(1, 1)
-            #M.executeMachineTurn(fields, "X" , type)
-            M.print_table()
-        else:
-            selectedType = M.select_type("X")
-            M.executeTurn(selectedType, "X")
-        M.check_full()
-        M.check_for_win("X")
-        if i == 4:
-            break
-        if machine:
-            #fields, type = getAction(1, 1)
-            #M.executeMachineTurn(fields, "O", type)
-            M.print_table()
-        else:
-            selectedType = M.select_type("O")
-            M.executeTurn(selectedType, "O")
-        M.check_for_win("O")
-        M.check_full()
-    M.final()
-
-
-
-
-
 if __name__ == "__main__":
-    main()
+    game = Game()
+    game.main()
 
 
