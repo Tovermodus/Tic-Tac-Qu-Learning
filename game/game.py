@@ -24,7 +24,7 @@ class Board():
                               [3, 4, 5], [2, 4, 6]]
         self.game_full = False
         self.moves = []
-        self.superpositions_map = {"X": [], "O": []}
+        self.superpositions_map = []
         self.superpositions = []
         self.superpositioncounter = {"X": 0, "O": 0}
 
@@ -90,7 +90,7 @@ class Move(Board):
     def set_superposition(self, super1, super2, player):
         lis = [super1, super2]
         lis.sort()
-        self.superpositions_map[palyer] = lis
+        self.superpositions_map.append(player)
         self.superpositions.append(lis)
 
     def select_and_set_field(self, player, superpos, super_iter):
@@ -123,7 +123,7 @@ class Move(Board):
         for i in range(len(self.superpositions)):
             index = int(q_res[i])
             pos = self.superpositions[i][index]
-            player = self.superpositions_map[f"{self.superpositions[i]}"]
+            player = self.superpositions_map[i]
             self.numbers[pos] = player
 
 
@@ -184,7 +184,9 @@ def measure(circ):
     job = execute(circ, backend)
     result = job.result()
     counts = execute(circ, Aer.get_backend('qasm_simulator'), shots=1).result().get_counts()
+    print(counts)
     res = [i for i in counts.keys()]
+    print(res)
     return res[0]
 
 
