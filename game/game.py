@@ -174,7 +174,7 @@ class Move(Board):
     def check_full(self):
         for i in self.numbers:
             if not isinstance(i, int):
-                
+                pass
 
 
 
