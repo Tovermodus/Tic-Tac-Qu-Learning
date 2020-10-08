@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 
-#from ..Interface import *
-
 from .qiskit_circ import *
 
 
@@ -195,34 +193,6 @@ class Game():
         else:
             print("Its a tie!")
 
-    def main(self):
-
-
-        for i in range(5):
-            self.print_table()
-            machine = False
-            # machine = isMachine()
-            if machine:
-                # fields, type = getAction(1, 1)
-                # M.executeMachineTurn(fields, "X" , type)
-                self.print_table()
-            else:
-                selectedType = self.select_type("X")
-                self.executeTurn(selectedType, "X")
-            self.check_full()
-            self.check_for_win("X")
-            if i == 4:
-                break
-            if machine:
-                # fields, type = getAction(1, 1)
-                # M.executeMachineTurn(fields, "O", type)
-                self.print_table()
-            else:
-                selectedType = self.select_type("O")
-                self.executeTurn(selectedType, "O")
-            self.check_for_win("O")
-            self.check_full()
-        self.final()
 
 
 
@@ -230,10 +200,5 @@ class Game():
 
 def machine_input():
     return
-
-
-if __name__ == "__main__":
-    game = Game()
-    game.main()
 
 
