@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 
-import sys
 #from ..Interface import *
-from qiskit import *
 
 
-
-from qiskit import QuantumCircuit, execute, Aer
-from qiskit import QuantumCircuit
 import numpy as np
+from qiskit import QuantumCircuit
+from qiskit import execute, Aer
+
 
 class QiskitCircuitMaker():
 
