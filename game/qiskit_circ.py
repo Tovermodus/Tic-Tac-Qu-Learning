@@ -79,7 +79,7 @@ class QiskitCircuitMaker():
         for i in range(len(single_qbits_counts)):
             if single_qbits_counts[i] == 2:
                 n_ent_qbits.append(i)
-                # print('qbit:', i, 'is not entangeled')
+
 
         # draw circuit for the qbits that are not entagled
         for i in range(len(n_ent_qbits)):
