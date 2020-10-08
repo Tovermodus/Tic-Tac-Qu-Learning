@@ -8,6 +8,24 @@ from qiskit import QuantumCircuit
 from qiskit import execute, Aer
 
 
+def find_next_in_chain(flat_superpositions, index):
+    for i in range(len(flat_superpositions)):
+        if i == index:
+            continue
+        if flat_superpositions[i] == flat_superpositions[index]:
+            return i
+    return -1
+
+
+def get_pair_index(index):
+    print("index")
+    print(index)
+    if index % 2 == 1:
+        print(index - 1)
+        return index - 1
+    else:
+        print(index + 1)
+        return index + 1
 class QiskitCircuitMaker():
 
     def __init__(self):
@@ -20,14 +38,14 @@ class QiskitCircuitMaker():
 
         initial_state = [0, 1]
         circ = QuantumCircuit(length, length)
-
+        circ, superpositions = self.part_ent_circ(circ, superpositions)
         circ = self.set_double_circ(circ, superpositions)
 
         circ = self.set_single_circ(circ, superpositions)
         measure_list = [i for i in range(length)]
         circ.measure(measure_list, measure_list)
         print(circ.draw())
-        return circ
+        return circ, superpositions
 
     def set_double_circ(self, circ, superpositions):
         already_set_cx = []
@@ -83,6 +101,88 @@ class QiskitCircuitMaker():
 
         return circ
 
+    def part_ent_circ(self, circ, superpositions):
+
+        #        already_set = []
+        #        had = []
+        length = len(superpositions)
+        flat_superpositions = []
+        for i in range(length):
+            flat_superpositions.append(superpositions[i][0])
+            flat_superpositions.append(superpositions[i][1])
+        print(flat_superpositions)
+        entanglements = []
+        flat_entanglements = []
+        for i in range(len(flat_superpositions)):
+            for j in range(i,len(flat_superpositions)):
+                if flat_superpositions[i] in flat_entanglements or flat_superpositions[j] in flat_entanglements:
+                    continue
+                if flat_superpositions[i] == flat_superpositions[j]:
+                    entanglement_position = len(entanglements)
+                    entanglements.append([ flat_superpositions[get_pair_index(i)],flat_superpositions[i]])
+                    flat_entanglements.append(flat_superpositions[i])
+                    flat_entanglements.append(flat_superpositions[get_pair_index(i)])
+                    print(i, get_pair_index(i))
+                    chain_index = j
+                    while find_next_in_chain(flat_superpositions, chain_index) != -1:
+                        print(chain_index, get_pair_index(chain_index))
+                        chain_index = get_pair_index(find_next_in_chain(flat_superpositions, chain_index))
+                        entanglements[entanglement_position].append(flat_superpositions[chain_index])
+                        entanglements[entanglement_position].append(flat_superpositions[get_pair_index(chain_index)])
+                        flat_entanglements.append(get_pair_index(chain_index))
+                        flat_entanglements.append(chain_index)
+                        if flat_superpositions[chain_index] == entanglements[entanglement_position][0]:
+                            break
+        print("entanglements", entanglements)
+        print(flat_entanglements)
+    """
+        print(entanglements)
+        for i in range(length):
+            for k in range(length):
+                if i == k:
+                    continue
+                if(superpositions[i] == superpositions[k])
+                    entanglement_position = len(entanglements)
+                    entanglements.append()
+                
+                if superpositions[i] == superpositions[k]:
+                    continue
+                if i == k:
+                    continue
+
+                for j in superpositions[i]:
+
+                    if j in superpositions[k]:
+                        if i < k:
+
+                            if (superpositions[i].index(j) == 0 and superpositions[k].index(j) == 0):
+                                superpositions[i][0], superpositions[i][1] = superpositions[i][1], superpositions[i][0]
+
+
+                            if (superpositions[i].index(j) == 1 and superpositions[k].index(j) == 1):
+                                superpositions[k][0], superpositions[k][1] = superpositions[k][1], superpositions[k][0]
+
+                            if (superpositions[i].index(j) == 0 and superpositions[k].index(j) == 1):
+                                superpositions[k][0], superpositions[k][1] = superpositions[k][1], superpositions[k][0]
+                                superpositions[i][0], superpositions[i][1] = superpositions[i][1], superpositions[i][0]
+
+                            if not j in already_set:
+
+
+
+
+                                if not i in had:
+                                    circ.h(i)
+                                if not k in had:
+                                    circ.h(k)
+                                circ.ch(i, k)
+                                circ.cx(i, k)
+                                already_set.append(j)
+                                had.append(i)
+                                had.append(k)
+        print(superpositions)
+        return circ, superpositions
+    """
 
     def measure(self, circ):
         backend = Aer.get_backend('statevector_simulator')
