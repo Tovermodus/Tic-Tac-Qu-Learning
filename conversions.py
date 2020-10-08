@@ -23,7 +23,7 @@ def learningActionToGameAction(learningAction):
     for l in range(9):
         actions[counter]=([l],1)
         counter+=1
-    return actions
+    return actions[learningAction]
                 
 actions=learningActionToGameAction(3)
 #%%

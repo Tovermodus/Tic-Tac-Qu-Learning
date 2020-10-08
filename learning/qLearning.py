@@ -25,23 +25,24 @@ class QLearner:
         self.learningRate = 0.5
         self.neuralNet = NeuralNetwork()
         self.explorationT = 200
+
         self.learningEntries = []
 
     def Qvalue(self, actionID):
         return self.neuralNet.predict(LearningEntry(self.playerID, self.boardState, actionID, 0).compileFeature())
 
-    def maximumReward(self, bordState):
+    def maximumReward(self):
         rewards = np.zeros(Interface.actions)
         for actionID in range(Interface.actions):
             rewards[actionID] = self.Qvalue(actionID)
         return np.max(rewards)
 
-    def maximumFutureReward(self, actionID):
-        return self.maximumReward(Interface.getStateAfterAction(self.playerID, actionID))
+    def maximumFutureReward(self):
+        return self.maximumReward()
 
     def newQValue(self, actionID, reward):
         return (1 - self.learningRate) * self.Qvalue(actionID) \
-               + self.learningRate * (reward + self.discountFactor * self.maximumFutureReward(actionID))
+               + self.learningRate * (reward + self.discountFactor * self.maximumFutureReward())
 
     def saveLearningEntry(self, reward):
         self.learningEntries.append(LearningEntry(self.playerID, self.boardState, self.lastActionID, self.newQValue(self.lastActionID, reward)))
@@ -52,8 +53,8 @@ class QLearner:
         nnt = NeuralNetworkTrainer(self.neuralNet, features, labels)
         nnt.train()
 
-    def nextAction(self):  # Maxwell Boltzmann Exploration
-        self.boardState = Interface.getCurrentBoardState()
+    def nextAction(self, interface):  # Maxwell Boltzmann Exploration
+        self.boardState = interface.getCurrentBoardState()
 
         expProbabilities = np.zeros(Interface.actions)
         probabilities = np.zeros(Interface.actions)

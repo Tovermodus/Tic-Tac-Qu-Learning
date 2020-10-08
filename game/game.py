@@ -6,7 +6,7 @@ from .qiskit_circ import *
 
 import sys
 
-from qiskit_circ import QiskitCircuitMaker
+from game.qiskit_circ import QiskitCircuitMaker
 
 
 class Game():
