@@ -3,7 +3,7 @@
 
 #from ..Interface import *
 import sys
-from game.qiskit_circ import QiskitCircuitMaker
+import game.qiskit_circ as qc
 
 
 class Game():
@@ -190,39 +190,34 @@ class Game():
         return False
 
 
-    def set_end(self, q_res, superpositions):
-        print(superpositions)
-        print(self.superpositions)
-        print(self.superpositions_map)
-        for i in range(len(superpositions)-1,-1,-1):
-            print(i)
-            index = int(q_res[i])
-            pos = superpositions[i][index]
-            player = self.superpositions_map[i]
-            self.numbers[pos] = player
-        for i in range(len(self.numbers)):
-            if isinstance(self.numbers[i], int):
-                self.numbers[i] = ""
-            elif "X_" in self.numbers[i] or "O_" in self.numbers[i]:
-                self.numbers[i] = ""
-
     def check_full(self, player):
         if all(isinstance(x, str) for x in self.numbers):
             print(self.superpositioncounter[player])
             if self.superpositioncounter[player] == 2:
 
                 self.game_full = True
-                self.final()
+               # self.final()
             else:
                 pass
 
     def final(self):
-        print(self.superpositions)
-        print(self.superpositions_map)
-        Q = QiskitCircuitMaker()
-        circ, superpositions = Q.set_qiskit_superpos_circ(self.superpositions)
-        res = Q.measure(circ)
-        self.set_end(res, superpositions)
+        Q = qc.QiskitCircuit(self.superpositions)
+        for e in Q.entanglements:
+            if e[0] == e[-1]:
+                meas = Q.measure_loop_circ(e)
+            else:
+                meas = Q.measure_chain_circ(e)
+            print(e)
+            print(meas)
+            for i in range(len(e)//2):
+                print(qc.getOriginalState(e,i,self.superpositions))
+                invert, index = qc.getOriginalState(e, i, self.superpositions)
+                player = self.superpositions_map[index]
+                print(index, player)
+                #if not invert:
+                #    meas[i] = 1-meas[i]
+                self.numbers[e[2*i+meas[i]]] = player
+
         self.print_table()
         winner = self.check_for_win(False, True)
         print(self.interface_numbers)

@@ -33,7 +33,7 @@ class Interface:
 
             if i == 4:
                 break
-            if machine:
+            if self.isMachine("O"):
                 fields, type = self.getAction(1)
                 allowed = self.g.executeMachineTurn(fields, "O", type)
                 self.g.print_table()
@@ -56,9 +56,7 @@ class Interface:
             self.ql2.saveLearningEntry(reward)
 
     def isMachine(self, playerName):
-        #if playerName == 'X':
-        #    return True
-        return False
+        return True
 
     def getAction(self, playerID):
         actionID = 0

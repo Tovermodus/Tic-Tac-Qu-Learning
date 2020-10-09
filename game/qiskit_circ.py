@@ -41,18 +41,20 @@ def getOriginalState(entanglement, stateIndex, superpositions,eliminate=False):
     return "Error"
 
 
-class QiskitCircuitMaker():
+class QiskitCircuit():
 
-    def __init__(self):
+    def __init__(self, superpositions):
+        self.backend = Aer.get_backend('statevector_simulator')
         self.initial_state = [0, 1]
-
+        self.entanglements = self.identify_entanglements(superpositions)
+    """
     def set_qiskit_superpos_circ(self, superpositions):
 
 
         length = len(superpositions)
 
         initial_state = [0, 1]
-        circ = QuantumCircuit(length, length)
+        
         entanglements = self.identify_entanglements(superpositions)
         print(entanglements, "aksjdhalksj")
         new_superpositions = []
@@ -69,31 +71,37 @@ class QiskitCircuitMaker():
         circ.measure(measure_list, measure_list)
         print(circ.draw())
         return circ, new_superpositions
+    """
 
-    def set_loop_circ(self, circ, entanglement, superpositions):
-        print("loop")
-        if(len(entanglement) != 4):
-            invert, index = getOriginalState(entanglement, 0, superpositions)
-        else:
-            invert, index = getOriginalState(entanglement, 0, superpositions, eliminate=True)
-        circ.h(index)
-        for i in range((len(entanglement)-2)//2):
-            invert, index = getOriginalState(entanglement, i, superpositions)
-            invertp, indexp = getOriginalState(entanglement, i+1, superpositions)
-            circ.cx(index, indexp)
-        return circ, superpositions
 
-    def set_chain_circ(selfself, circ, entanglement, superpositions):
-        print("chain")
-        for i in range(len(entanglement)//2):
-            invert, index = getOriginalState(entanglement, i, superpositions)
-            circ.h(index)
-        for i in range((len(entanglement)-2)//2):
-            invert, index = getOriginalState(entanglement, i, superpositions)
-            invertp, indexp = getOriginalState(entanglement, i+1, superpositions)
-            circ.ch(index, indexp)
-            circ.cx(index, indexp)
-        return circ, superpositions
+    def measure_loop_circ(self, entanglement):
+        length = len(entanglement)//2
+        circ = QuantumCircuit(length, length)
+        circ.h(0)
+        for i in range(length-1):
+            circ.cx(i, i+1)
+        measure_list = [i for i in range(length)]
+        circ.measure(measure_list, measure_list)
+        print(circ.draw())
+        counts = execute(circ, Aer.get_backend('qasm_simulator'), shots=1).result().get_counts()
+        print(list(counts.keys())[0])
+        print([int(c) for c in list(counts.keys())[0]])
+        return [int(c) for c in list(counts.keys())[0]]
+
+    def measure_chain_circ(self, entanglement):
+        length = len(entanglement) // 2
+        circ = QuantumCircuit(length, length)
+        for i in range(length):
+            circ.h(i)
+        for i in range(length - 1):
+            circ.ch(i, i + 1)
+            circ.cx(i,i+1)
+        measure_list = [i for i in range(length)]
+        circ.measure(measure_list, measure_list)
+        print(circ.draw())
+        counts = execute(circ, Aer.get_backend('qasm_simulator'), shots=1).result().get_counts()
+        return [int(c) for c in list(counts.keys())[0]]
+
 
 
     def identify_entanglements(self, superpositions):
@@ -141,14 +149,10 @@ class QiskitCircuitMaker():
                             chain_ends.remove(chain_ends[0])
                             break
                         chain_ends[0] = next_chain
+        for i in range(len(flat_superpositions)):
+            if not i in flat_entanglements:
+                entanglements.append([flat_superpositions[i], flat_superpositions[get_pair_index(i)]])
+                flat_entanglements.append(i)
+                flat_entanglements.append(get_pair_index(i))
+                print(entanglements[-1])
         return entanglements
-
-    def measure(self, circ):
-        backend = Aer.get_backend('statevector_simulator')
-        job = execute(circ, backend)
-        result = job.result()
-        counts = execute(circ, Aer.get_backend('qasm_simulator'), shots=1).result().get_counts()
-        print(counts)
-        res = [i for i in counts.keys()]
-        print(res)
-        return res[0]
