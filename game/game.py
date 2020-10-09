@@ -36,8 +36,6 @@ class Game():
     def check_type(self, selectedType, player):
         if selectedType not in [1, 2]:
             return False
-        if selectedType == 2:
-            self.superpositioncounter[player] += 1
         elif selectedType == 2 and self.superpositioncounter[player] == 2:
             print("You've already made 2 quantum moves!")
             return False
@@ -53,15 +51,13 @@ class Game():
                     return False
             else:
                 return False
-        return True
+        else:
+            return True
 
     def select_type(self, player, machine=False):
-        selected = False
-
-        while not selected:
+        while True:
             try:
-                inp = input("Select 1 for classical or 2 for quantum move.")
-                selectedType = int(inp)
+                selectedType = int(input("Select 1 for classical or 2 for quantum move."))
                 if self.check_type(selectedType, player):
                     return selectedType
             except:
@@ -70,8 +66,7 @@ class Game():
                 print("Pick correct number!")
 
     def select_field(self, selectedType, machine=False):
-        selected = False
-        while not selected:
+        while True:
             try:
                 selectedNumber = int(input("Select available field"))
                 if self.check_field(selectedNumber, selectedType):

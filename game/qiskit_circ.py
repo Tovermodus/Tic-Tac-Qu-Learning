@@ -8,24 +8,6 @@ from qiskit import QuantumCircuit
 from qiskit import execute, Aer
 
 
-def find_next_in_chain(flat_superpositions, index):
-    for i in range(len(flat_superpositions)):
-        if i == index:
-            continue
-        if flat_superpositions[i] == flat_superpositions[index]:
-            return i
-    return -1
-
-
-def get_pair_index(index):
-    print("index")
-    print(index)
-    if index % 2 == 1:
-        print(index - 1)
-        return index - 1
-    else:
-        print(index + 1)
-        return index + 1
 class QiskitCircuitMaker():
 
     def __init__(self):
@@ -42,6 +24,8 @@ class QiskitCircuitMaker():
         circ = self.set_double_circ(circ, superpositions)
 
         circ = self.set_single_circ(circ, superpositions)
+
+        #circ = self.part_ent_circ(superpositions)
         measure_list = [i for i in range(length)]
         circ.measure(measure_list, measure_list)
         print(circ.draw())
@@ -63,7 +47,6 @@ class QiskitCircuitMaker():
                             circ.initialize(self.initial_state, k)
                             circ.cx(i, k)
                             already_set_cx.append(lis)
-                            print('already set cx =', already_set_cx)
         return circ
 
     def set_single_circ(self, circ, superpositions):
@@ -103,48 +86,11 @@ class QiskitCircuitMaker():
 
     def part_ent_circ(self, circ, superpositions):
 
-        #        already_set = []
-        #        had = []
+        already_set = []
+        had = []
         length = len(superpositions)
-        flat_superpositions = []
-        for i in range(length):
-            flat_superpositions.append(superpositions[i][0])
-            flat_superpositions.append(superpositions[i][1])
-        print(flat_superpositions)
-        entanglements = []
-        flat_entanglements = []
-        for i in range(len(flat_superpositions)):
-            for j in range(i,len(flat_superpositions)):
-                if flat_superpositions[i] in flat_entanglements or flat_superpositions[j] in flat_entanglements:
-                    continue
-                if flat_superpositions[i] == flat_superpositions[j]:
-                    entanglement_position = len(entanglements)
-                    entanglements.append([ flat_superpositions[get_pair_index(i)],flat_superpositions[i]])
-                    flat_entanglements.append(flat_superpositions[i])
-                    flat_entanglements.append(flat_superpositions[get_pair_index(i)])
-                    print(i, get_pair_index(i))
-                    chain_index = j
-                    while find_next_in_chain(flat_superpositions, chain_index) != -1:
-                        print(chain_index, get_pair_index(chain_index))
-                        chain_index = get_pair_index(find_next_in_chain(flat_superpositions, chain_index))
-                        entanglements[entanglement_position].append(flat_superpositions[chain_index])
-                        entanglements[entanglement_position].append(flat_superpositions[get_pair_index(chain_index)])
-                        flat_entanglements.append(get_pair_index(chain_index))
-                        flat_entanglements.append(chain_index)
-                        if flat_superpositions[chain_index] == entanglements[entanglement_position][0]:
-                            break
-        print("entanglements", entanglements)
-        print(flat_entanglements)
-    """
-        print(entanglements)
         for i in range(length):
             for k in range(length):
-                if i == k:
-                    continue
-                if(superpositions[i] == superpositions[k])
-                    entanglement_position = len(entanglements)
-                    entanglements.append()
-                
                 if superpositions[i] == superpositions[k]:
                     continue
                 if i == k:
@@ -182,7 +128,7 @@ class QiskitCircuitMaker():
                                 had.append(k)
         print(superpositions)
         return circ, superpositions
-    """
+
 
     def measure(self, circ):
         backend = Aer.get_backend('statevector_simulator')
