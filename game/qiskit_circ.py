@@ -54,7 +54,7 @@ class QiskitCircuitMaker():
         initial_state = [0, 1]
         circ = QuantumCircuit(length, length)
         entanglements = self.identify_entanglements(superpositions)
-        print(entanglements, "aksjdhalksj")
+        print(entanglements, "<- Entanglements")
         new_superpositions = []
         for e in entanglements:
             if(e[0] == e[-1]):
@@ -64,14 +64,14 @@ class QiskitCircuitMaker():
             for i in range(len(e)//2):
                 new_superpositions.append([e[i*2],e[i*2+1]])
             #circ.measure
-        print(len(entanglements))
         measure_list = [i for i in range(length)]
         circ.measure(measure_list, measure_list)
+        print('set_qiskit_superpos_circ: new_superpositions', new_superpositions)
         print(circ.draw())
         return circ, new_superpositions
 
     def set_loop_circ(self, circ, entanglement, superpositions):
-        print("loop")
+        print("loop circuit identified")
         if(len(entanglement) != 4):
             invert, index = getOriginalState(entanglement, 0, superpositions)
         else:
@@ -84,7 +84,7 @@ class QiskitCircuitMaker():
         return circ, superpositions
 
     def set_chain_circ(selfself, circ, entanglement, superpositions):
-        print("chain")
+        print("chain circuit identified")
         for i in range(len(entanglement)//2):
             invert, index = getOriginalState(entanglement, i, superpositions)
             circ.h(index)
@@ -148,7 +148,7 @@ class QiskitCircuitMaker():
         job = execute(circ, backend)
         result = job.result()
         counts = execute(circ, Aer.get_backend('qasm_simulator'), shots=1).result().get_counts()
-        print(counts)
+        print('measure: counts =',counts)
         res = [i for i in counts.keys()]
-        print(res)
+        print('measure: res =',res)
         return res[0]

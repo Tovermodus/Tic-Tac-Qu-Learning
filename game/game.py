@@ -191,11 +191,11 @@ class Game():
 
 
     def set_end(self, q_res, superpositions):
-        print(superpositions)
-        print(self.superpositions)
-        print(self.superpositions_map)
+        print('set_end: superpositions :',superpositions)
+        print('set_end: self.superpositions (original)',self.superpositions)
+        print('set_end: self.superpositions_map (original player map)',self.superpositions_map)
         for i in range(len(superpositions)-1,-1,-1):
-            print(i)
+            #print(i)  benutzt um zu bestaetigen, dass abwaerts gezaehlt wurde 3,2,1,0
             index = int(q_res[i])
             pos = superpositions[i][index]
             player = self.superpositions_map[i]
@@ -208,7 +208,7 @@ class Game():
 
     def check_full(self, player):
         if all(isinstance(x, str) for x in self.numbers):
-            print(self.superpositioncounter[player])
+            print('check_full: self.superpositioncounter[player]',self.superpositioncounter[player])
             if self.superpositioncounter[player] == 2:
 
                 self.game_full = True
@@ -217,15 +217,16 @@ class Game():
                 pass
 
     def final(self):
-        print(self.superpositions)
-        print(self.superpositions_map)
+        print('final: self.superpositions',self.superpositions)
+        print('final: self.superpositions_map (original player map)', self.superpositions_map)
         Q = QiskitCircuitMaker()
-        circ, superpositions = Q.set_qiskit_superpos_circ(self.superpositions)
+        circ, new_superpositions = Q.set_qiskit_superpos_circ(self.superpositions)
         res = Q.measure(circ)
-        self.set_end(res, superpositions)
+        print('final: res', res)
+        self.set_end(res, new_superpositions)
         self.print_table()
         winner = self.check_for_win(False, True)
-        print(self.interface_numbers)
+        print('final: self.interface_numbers', self.interface_numbers)
         return winner
 
 
