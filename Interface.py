@@ -12,8 +12,10 @@ class Interface:
         self.ql2 = learning.QLearner(1)
 
     def main(self):
-        for i in range(5):
-            self.g.print_table()
+        i = 0
+        self.g.print_table()
+        while self.g.game_full == False:
+
             machine = False
             # machine = isMachine()
             allowed = True
@@ -23,28 +25,30 @@ class Interface:
                 allowed = self.g.executeMachineTurn(fields, "X", type)
                 self.g.print_table()
                 win = self.g.check_for_win("X")
-                self.g.check_full("X")
+                self.g.check_full("O")
                 self.sendResult(0, [allowed, win])
             else:
                 selectedType = self.g.select_type("X")
                 self.g.executeTurn(selectedType, "X")
-                self.g.check_full("X")
+                self.g.check_full("O")
                 self.g.check_for_win("X")
 
-            if i == 4:
-                break
             if self.isMachine("O"):
                 fields, type = self.getAction(1)
                 allowed = self.g.executeMachineTurn(fields, "O", type)
                 self.g.print_table()
-                win = self.g.check_for_win("X")
-                self.g.check_full("O")
+                win = self.g.check_for_win("O")
+                self.g.check_full("X")
                 self.sendResult(1, [allowed, win])
             else:
                 selectedType = self.g.select_type("O")
                 self.g.executeTurn(selectedType, "O")
-                self.g.check_full("O")
+                self.g.check_full("X")
                 self.g.check_for_win("O")
+            i += 1
+            if i == 15:
+                break
+        #print(self.g.superpositions)
         self.g.final()
 
     def sendResult(self, playerID, gameResult):
@@ -56,7 +60,10 @@ class Interface:
             self.ql2.saveLearningEntry(reward)
 
     def isMachine(self, playerName):
-        return True
+        if playerName == "X":
+            return False
+        else:
+            return False
 
     def getAction(self, playerID):
         actionID = 0
