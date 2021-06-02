@@ -12,7 +12,7 @@ blocks:
       jobs:
         - name: Docker
           commands:
-            - docker build -t tic-tac-qu-postgres -f Docker/PostgresDBImage/Dockerfile .
+            - docker build -t tic-tac-qu-postgres -f docker/PostgresDBImage/Dockerfile .
   - name: Build DB Image
     dependencies:
       - Checkout
@@ -20,7 +20,7 @@ blocks:
       jobs:
         - name: Docker
           commands:
-            - docker build -t tic-tac-qu-flask-test -f Docker/FlaskImage/Dockerfile .
+            - docker build -t tic-tac-qu-flask-test -f docker/FlaskImage/Dockerfile .
   - name: Build Compose Environment
     dependencies:
       - Build DB Image
@@ -37,3 +37,7 @@ blocks:
         - name: Checkout
           commands:
             - checkout
+      epilogue:
+        always:
+          commands:
+            - ls
