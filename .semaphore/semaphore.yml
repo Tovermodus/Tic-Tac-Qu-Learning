@@ -13,6 +13,9 @@ blocks:
         - name: Docker
           commands:
             - docker build -t tic-tac-qu-postgres -f docker/PostgresDBImage/Dockerfile .
+      prologue:
+        commands:
+          - ls
   - name: Build DB Image
     dependencies:
       - Checkout
@@ -21,6 +24,9 @@ blocks:
         - name: Docker
           commands:
             - docker build -t tic-tac-qu-flask-test -f docker/FlaskImage/Dockerfile .
+      prologue:
+        commands:
+          - ls
   - name: Build Compose Environment
     dependencies:
       - Build DB Image
