@@ -5,4 +5,4 @@ RUN pip3 install -r requirements.txt
 ENV FLASK_APP webinterface
 COPY . .
 WORKDIR /app/python
-CMD ["python3", "test_suite.py"]
+CMD ["flask", "run", "--host=0.0.0.0"]
