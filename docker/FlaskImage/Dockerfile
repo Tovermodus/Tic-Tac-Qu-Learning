@@ -5,4 +5,5 @@ RUN apt-get update && apt-get -y install cmake
 RUN pip3 install -r requirements.txt
 ENV FLASK_APP webinterface
 COPY . .
+WORKDIR /app/python
 CMD ["python3", "test_suite.py"]
