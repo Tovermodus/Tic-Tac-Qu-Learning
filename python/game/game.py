@@ -3,7 +3,7 @@
 
 #from ..Interface import *
 import sys
-import game.qiskit_circ as qc
+import python.game.game.qiskit_circ as qc
 
 
 class Game():

@@ -1,6 +1,6 @@
-from learning.NeuralNetwork import NeuralNetwork
-from learning.NeuralNetwork import NeuralNetworkTrainer
-import Interface
+from python.learning.NeuralNetwork import NeuralNetwork
+from python.learning.NeuralNetwork import NeuralNetworkTrainer
+from python import Interface
 import numpy as np
 
 

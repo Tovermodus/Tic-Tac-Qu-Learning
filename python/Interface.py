@@ -1,6 +1,6 @@
-import game.game as game
-import learning.qLearning as learning
-import conversions
+from python.game import game as game
+import python.learning.qLearning as learning
+from python import conversions
 from copy import deepcopy
 
 actions = 45
