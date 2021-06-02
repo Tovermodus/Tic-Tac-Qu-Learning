@@ -6,14 +6,16 @@ agent:
     os_image: ubuntu1804
 blocks:
   - name: Build Flask Image
-    dependencies: []
+    dependencies:
+      - Checkout
     task:
       jobs:
         - name: Docker
           commands:
             - docker build -t tic-tac-qu-postgres -f Docker/PostgresDBImage/Dockerfile .
   - name: Build DB Image
-    dependencies: []
+    dependencies:
+      - Checkout
     task:
       jobs:
         - name: Docker
@@ -28,3 +30,10 @@ blocks:
         - name: Compose
           commands:
             - docker-compose -f Docker/ComposeTest/docker-compose.yml up
+  - name: Checkout
+    dependencies: []
+    task:
+      jobs:
+        - name: Checkout
+          commands:
+            - checkout
