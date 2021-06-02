@@ -12,11 +12,7 @@ blocks:
         - name: Flask
           commands:
             - docker build -t tic-tac-qu-flask-test -f docker/FlaskImage/Dockerfile .
-        - name: Postgres
-          commands:
             - docker build -t tic-tac-qu-postgres -f docker/PostgresDBImage/Dockerfile .
-        - name: Compose
-          commands:
             - docker-compose -f docker/ComposeTest/docker-compose.yml up
       prologue:
         commands:
