@@ -12,6 +12,9 @@ blocks:
       jobs:
         - name: Docker
           commands:
+            - ls
+        - name: 'Job #2'
+          commands:
             - docker build -t tic-tac-qu-postgres -f docker/PostgresDBImage/Dockerfile .
       prologue:
         commands:
