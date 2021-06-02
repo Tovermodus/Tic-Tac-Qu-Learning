@@ -5,45 +5,19 @@ agent:
     type: e1-standard-2
     os_image: ubuntu1804
 blocks:
-  - name: Build Flask Image
-    dependencies:
-      - Checkout
-    task:
-      jobs:
-        - name: Docker
-          commands:
-            - docker build -t tic-tac-qu-postgres -f docker/PostgresDBImage/Dockerfile .
-      prologue:
-        commands:
-          - checkout
-  - name: Build DB Image
-    dependencies:
-      - Checkout
-    task:
-      jobs:
-        - name: Docker
-          commands:
-            - docker build -t tic-tac-qu-flask-test -f docker/FlaskImage/Dockerfile .
-      prologue:
-        commands:
-          - checkout
-  - name: Build Compose Environment
-    dependencies:
-      - Build DB Image
-      - Build Flask Image
-    task:
-      jobs:
-        - name: Compose
-          commands:
-            - docker-compose -f Docker/ComposeTest/docker-compose.yml up
-  - name: Checkout
+  - name: Docker
     dependencies: []
     task:
       jobs:
-        - name: Checkout
+        - name: Flask
           commands:
-            - checkout
-      epilogue:
-        always:
+            - docker build -t tic-tac-qu-flask-test -f docker/FlaskImage/Dockerfile .
+        - name: Postgres
           commands:
-            - ls
+            - docker build -t tic-tac-qu-postgres -f docker/PostgresDBImage/Dockerfile .
+        - name: Compose
+          commands:
+            - docker-compose -f docker/ComposeTest/docker-compose.yml up
+      prologue:
+        commands:
+          - checkout
