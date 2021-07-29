@@ -4,3 +4,4 @@ qiskit == 0.26.2
 flask-sqlalchemy == 2.5.1
 psycopg2 == 2.9.1
 Flask-Migrate == 3.0.1
+Flask-API == 3.0.post1

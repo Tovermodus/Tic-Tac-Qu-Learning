@@ -5,17 +5,16 @@ services:
     image: tic-tac-qu-flask-system
     ports:
     - 5000:5000
-    links:
-      - "db:pgsql-server"
     depends_on:
+      - db
+    links:
+      # network connection with these services
       - db
 
   db:
     image: tic-tac-qu-postgres
     ports:
       - "5432:5432"
-    networks:
-      - postgres
 
   pgadmin:
     image: dpage/pgadmin4:5
@@ -26,10 +25,5 @@ services:
     ports:
       - "8080:80"
     links:
-      - "db:pgsql-server"
-    networks:
-      - postgres
-
-networks:
-  postgres:
-    driver: bridge
+      # network connection with these services
+      - db
