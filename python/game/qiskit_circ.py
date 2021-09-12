@@ -6,6 +6,7 @@
 import numpy as np
 from qiskit import QuantumCircuit
 from qiskit import execute, Aer
+from qiskit import IBMQ
 from copy import deepcopy
 
 
@@ -84,8 +85,8 @@ class QiskitCircuit():
         circ.measure(measure_list, measure_list)
         print(circ.draw())
         counts = execute(circ, Aer.get_backend('qasm_simulator'), shots=1).result().get_counts()
-        print(list(counts.keys())[0])
-        print([int(c) for c in list(counts.keys())[0]])
+        #print(list(counts.keys())[0])
+        #print([int(c) for c in list(counts.keys())[0]])
         return [int(c) for c in list(counts.keys())[0]]
 
     def measure_chain_circ(self, entanglement):
@@ -154,5 +155,6 @@ class QiskitCircuit():
                 entanglements.append([flat_superpositions[i], flat_superpositions[get_pair_index(i)]])
                 flat_entanglements.append(i)
                 flat_entanglements.append(get_pair_index(i))
-                print(entanglements[-1])
+                #print(entanglements[-1])
+        #print(entanglements)
         return entanglements

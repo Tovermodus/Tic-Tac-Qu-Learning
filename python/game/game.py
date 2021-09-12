@@ -36,7 +36,7 @@ class Game():
     def check_type(self, selectedType, player):
         if selectedType not in [1, 2]:
             return False
-        elif selectedType == 2 and self.superpositioncounter[player] > 2:
+        elif selectedType == 2 and self.superpositioncounter[player] == 2:
             print("You've already made 2 quantum moves!")
             return False
         return True
@@ -192,11 +192,11 @@ class Game():
 
     def check_full(self, player):
         if all(isinstance(x, str) for x in self.numbers):
-            print(self.superpositioncounter[player])
+            #print(self.superpositioncounter[player])
             if self.superpositioncounter[player] == 2:
 
                 self.game_full = True
-               # self.final()
+                self.final()
             else:
                 pass
 
@@ -207,20 +207,31 @@ class Game():
                 meas = Q.measure_loop_circ(e)
             else:
                 meas = Q.measure_chain_circ(e)
-            print(e)
-            print(meas)
+            #print(e)
+            #print(meas)
             for i in range(len(e)//2):
-                print(qc.getOriginalState(e,i,self.superpositions))
-                invert, index = qc.getOriginalState(e, i, self.superpositions)
+                #print(qc.getOriginalState(e,i,self.superpositions))
+                if len(e) == 4:
+                    invert, index = qc.getOriginalState(e, i, self.superpositions, eliminate=True)
+                else:
+                    invert, index = qc.getOriginalState(e, i, self.superpositions)
                 player = self.superpositions_map[index]
-                print(index, player)
+                #print(index, player)
                 #if not invert:
                 #    meas[i] = 1-meas[i]
                 self.numbers[e[2*i+meas[i]]] = player
-
+        for j in range(len(self.numbers)):
+            #print(self.numbers[j], type(self.numbers[j]))
+            try:
+                if "_" in self.numbers[j]:
+                    self.numbers[j] = ""
+            except:
+                self.numbers[j] = ""
         self.print_table()
         winner = self.check_for_win(False, True)
-        print(self.interface_numbers)
+        #print(self.interface_numbers)
+        print(self.superpositions)
+        self.end(winner)
         return winner
 
 
@@ -228,12 +239,13 @@ class Game():
     def end(self, winner):
         if winner:
             print(f"Player {winner} has won!")
+            sys.exit()
             if winner == "X":
                 return 1
             elif winner == "O":
                 return -1
         else:
-            print("Its a tie!")
+            #print("Its a tie!")
             return 0
 
 
