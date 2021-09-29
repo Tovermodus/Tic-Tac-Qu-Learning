@@ -6,13 +6,19 @@ services:
     ports:
     - 5000:5000
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     links:
       # network connection with these services
       - db
 
   db:
     image: tic-tac-qu-postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 2s
+      timeout: 2s
+      retries: 10
     ports:
       - "5432:5432"
 
@@ -22,6 +28,9 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@adminstuff.com
       PGADMIN_DEFAULT_PASSWORD: secret
       PGADMIN_LISTEN_PORT: 80
+    depends_on:
+      db:
+        condition: service_healthy
     ports:
       - "8080:80"
     links:

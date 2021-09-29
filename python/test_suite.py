@@ -10,6 +10,5 @@ def suite():
 
 
 if __name__ == '__main__':
-    time.sleep(1)
     runner = unittest.TextTestRunner()
     runner.run(suite())

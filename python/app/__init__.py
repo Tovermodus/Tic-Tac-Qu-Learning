@@ -19,7 +19,7 @@ class Game(db.Model):
     _id = db.Column("id", db.Integer, primary_key=True)
     player1 = db.Column("player1", db.String(20), nullable=False)
     player2 = db.Column("player2", db.String(20))
-    name = db.Column("gamename", db.String(8), nullable=False)
+    name = db.Column("gamename", db.String(8), unique=True, nullable=False)
     time = db.Column("started", db.DateTime, nullable=False)
     moves = db.relationship('Move', backref='game', lazy=True)
 

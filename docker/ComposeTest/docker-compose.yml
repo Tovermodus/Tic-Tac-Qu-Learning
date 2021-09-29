@@ -1,17 +1,23 @@
 version: "3.8"
 
 services:
+  db:
+    image: tic-tac-qu-postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+    ports:
+      - "5432:5432"
+
   flask:
     image: tic-tac-qu-flask-test
     ports:
     - 5000:5000
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     links:
       # network connection with these services
       - db
-
-  db:
-    image: tic-tac-qu-postgres
-    ports:
-      - "5432:5432"
