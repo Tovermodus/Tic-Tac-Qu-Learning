@@ -5,12 +5,12 @@ services:
     image: tic-tac-qu-flask-test
     ports:
     - 5000:5000
-    environment:
-      FLASK_ENV: "development"
-    links:
-      - "db:pgsql-server"
     depends_on:
       - db
+    links:
+      # network connection with these services
+      - db
+
   db:
     image: tic-tac-qu-postgres
     ports:
