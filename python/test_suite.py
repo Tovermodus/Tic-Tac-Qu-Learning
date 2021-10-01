@@ -1,5 +1,6 @@
 import time
 import unittest
+import sys
 from tests.game import CreationTest
 
 
@@ -11,4 +12,5 @@ def suite():
 
 if __name__ == '__main__':
     runner = unittest.TextTestRunner()
-    runner.run(suite())
+    ret = not runner.run(suite()).wasSuccessful()
+    sys.exit(ret)
