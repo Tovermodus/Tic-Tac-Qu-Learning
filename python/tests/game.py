@@ -1,14 +1,19 @@
 import unittest
-from app import app
+from app import app, db, Game
+import json
 import app.views
 import time
 
 
 class CreationTest(unittest.TestCase):
-    def test_create_game(self):
+    def test_singleplayer_create_game(self):
         with app.app.app_context():
-            print(app.views.create_game("Spiel3"))
-            assert 0 == 1
+            Game.query.delete()
+            ret = app.views.singleplayer_create_game("Spiel3", "ich")
+            result = json.loads(ret.get_data())
+            assert result[-1]["name"] == "Spiel3"
+            assert result[-1]["player1"] == "ich"
+            assert result[-1]["player2"] is None
 
 
 if __name__ == '__main__':

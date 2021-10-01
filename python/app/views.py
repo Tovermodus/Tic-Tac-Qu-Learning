@@ -6,9 +6,9 @@ import datetime
 def helloWorld():
     return "Hello World"
 
-@app.route("/newgame/<name>")
-def create_game(name):
-    new_game = Game(name=name, player1="ich", time=datetime.datetime.now())
+@app.route("/singleplayer/new/<name>/<player1>")
+def singleplayer_create_game(name, player1):
+    new_game = Game(name=name, player1=player1, time=datetime.datetime.now())
     db.session.add(new_game)
     db.session.commit()
     all_games = Game.query.all()
