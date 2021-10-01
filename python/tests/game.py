@@ -15,6 +15,15 @@ class CreationTest(unittest.TestCase):
             assert result[-1]["player1"] == "ich"
             assert result[-1]["player2"] is None
 
+    def test_singleplayer_create_game_twice(self):
+        with app.app.app_context():
+            Game.query.delete()
+            app.views.singleplayer_create_game("Spiel3", "ich")
+            ret = app.views.singleplayer_create_game("Spiel3", "ich")
+            result = json.loads(ret.get_data())
+            assert result["message"] == "name of game already exists in database"
+            assert result["status"] == 412
+
 
 if __name__ == '__main__':
     unittest.main()
