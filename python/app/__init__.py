@@ -16,29 +16,30 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
 class Game(db.Model):
-    _id = db.Column("id", db.Integer, primary_key=True)
+    id = db.Column("id", db.Integer, primary_key=True)
     player1 = db.Column("player1", db.String(20), nullable=False)
     player2 = db.Column("player2", db.String(20))
-    name = db.Column("gamename", db.String(8), unique=True, nullable=False)
+    name = db.Column("name", db.String(8), unique=True, nullable=False)
     time = db.Column("started", db.DateTime, nullable=False)
     moves = db.relationship('Move', backref='game', lazy=True)
 
 
 class GameSchema(ma.Schema):
     class Meta:
-        fields = ('name', 'player1', 'player2', 'time')
+        fields = ('id', 'name', 'player1', 'player2', 'time')
 
 
 class Move(db.Model):
-    _id = db.Column("id", db.Integer, primary_key=True)
+    id = db.Column("id", db.Integer, primary_key=True)
     position = db.Column("position", db.Integer, nullable=False)
     type = db.Column("type", db.Integer, nullable=False)
+    player = db.Column("player", db.String(20), nullable=False)
     game_id = db.Column(db.Integer, db.ForeignKey("game.id"), nullable=False)
 
 
 class MoveSchema(ma.Schema):
     class Meta:
-        fields = ('position', 'type')
+        fields = ('id', 'position', 'type', 'game_id', 'player')
 
 
 game_schema = GameSchema()
